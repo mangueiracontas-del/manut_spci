@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Saneamento e SPCI — Gestão de Demandas</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+<body>
+<div id="app">
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <div class="topbar-brand">
+    <svg viewBox="0 0 28 28" fill="none">
+      <rect width="28" height="28" rx="6" fill="#1F6FEB"/>
+      <path d="M6 14h16M14 6v16M8 8l12 12M20 8L8 20" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/>
+    </svg>
+    <span>Saneamento e SPCI</span>
+  </div>
+  <nav class="topbar-nav">
+    <button class="nav-btn active" onclick="showPage('demandas')" id="nav-demandas">
+      <svg class="icon" viewBox="0 0 16 16" fill="currentColor"><path d="M2 2h5v5H2zm7 0h5v5H9zm0 7h5v5H9zM2 9h5v5H2z"/></svg>
+      <span>Demandas</span>
+    </button>
+    <button class="nav-btn" onclick="showPage('login')" id="nav-login">
+      <svg class="icon" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1a3 3 0 100 6A3 3 0 008 1zm0 8c-3.3 0-6 1.5-6 3v1h12v-1c0-1.5-2.7-3-6-3z"/></svg>
+      <span id="user-nav-label">Entrar</span>
+    </button>
+  </nav>
+  <div class="topbar-right">
+    <div class="offline-badge" id="offline-badge">
+      <span class="pending-dot"></span> Offline — <span id="pending-count">0</span> pendente(s)
+    </div>
+  </div>
+</header>
+
+<div class="toast-container" id="toasts"></div>
+
+<main>
+
+<!-- PAGE DEMANDAS -->
+<div class="page active" id="page-demandas">
+  <div class="page-header">
+    <div>
+      <h1 style="font-size:20px;font-weight:600">Demandas de Manutenção</h1>
+      <p style="color:var(--text2);font-size:13px;margin-top:2px">Gerencie e acompanhe todas as solicitações</p>
+    </div>
+    <div class="page-header-actions">
+      <button class="btn btn-secondary btn-sm" onclick="exportExcel()">
+        <svg class="icon" viewBox="0 0 16 16" fill="currentColor"><path d="M2 2h8l4 4v8H2V2zm7-1v5h5M5 9l2 2-2 2M11 9l-2 2 2 2"/></svg>
+        Exportar Excel
+      </button>
+      <button class="btn btn-primary" onclick="openNovaDemanda(null)">
+        <svg class="icon" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1v14M1 8h14"/></svg>
+        Nova Demanda
+      </button>
+    </div>
+  </div>
+
+  <div class="stats-grid" id="stats-grid"></div>
+
+  <div class="card" style="margin-bottom:16px">
+    <div class="filter-bar">
+      <div class="search-box">
+        <svg viewBox="0 0 16 16" fill="currentColor"><path d="M6 1a5 5 0 100 10A5 5 0 006 1zm4.32 4.32l4.36 4.36-1.41 1.41-4.36-4.36A5 5 0 0010.32 5.32z"/></svg>
+        <input type="text" class="form-control" placeholder="Buscar ID, TAG, local, OM..." oninput="aplicarFiltros()" id="f-busca">
+      </div>
+      <input type="date" class="form-control" id="f-data-ini" onchange="aplicarFiltros()" title="Data inicial">
+      <input type="date" class="form-control" id="f-data-fim" onchange="aplicarFiltros()" title="Data final">
+      <select class="form-control" id="f-site" onchange="aplicarFiltros()"><option value="">Todos os sites</option></select>
+      <select class="form-control" id="f-local" onchange="aplicarFiltros()"><option value="">Todos os locais</option></select>
+      <select class="form-control" id="f-situacao" onchange="aplicarFiltros()">
+        <option value="">Todas situações</option>
+        <option value="Sistema parado - Crítico">Crítico</option>
+        <option value="Sistema parcialmente parado - Prioritário">Prioritário</option>
+        <option value="Sistema com Restrição - Moderado">Moderado</option>
+        <option value="Sistema operando - Leve">Leve</option>
+      </select>
+      <select class="form-control" id="f-prioridade" onchange="aplicarFiltros()">
+        <option value="">Prioridade</option>
+        <option>P0</option><option>P1</option><option>P2</option><option>P3</option><option>P4</option><option>P5</option>
+      </select>
+      <select class="form-control" id="f-status" onchange="aplicarFiltros()">
+        <option value="">Todos status</option>
+        <option>Aberta</option><option>Em Análise</option><option>Em Andamento</option><option>Concluída</option><option>Cancelada</option>
+      </select>
+      <select class="form-control" id="f-equipe" onchange="aplicarFiltros()">
+        <option value="">Todas as equipes</option>
+        <option>Manutenção Corretiva</option><option>Manutenção Preventiva</option><option>Inspeção</option><option>PCM</option>
+      </select>
+      <select class="form-control" id="f-solicitante" onchange="aplicarFiltros()"><option value="">Todos solicitantes</option></select>
+      <button class="btn btn-secondary btn-sm" onclick="limparFiltros()">Limpar</button>
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th><th>Data</th><th>Site</th><th>Local</th><th>TAG</th>
+          <th>Situação</th><th>Status</th><th>Prioridade</th><th>Equipe</th><th>Solicitante</th><th>Ações</th>
+        </tr>
+      </thead>
+      <tbody id="demandas-tbody"></tbody>
+    </table>
+  </div>
+  <div id="empty-demandas" class="empty-state" style="display:none">
+    <svg width="48" height="48" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="6" y="6" width="36" height="36" rx="3"/><path d="M16 18h16M16 26h10"/></svg>
+    <p>Nenhuma demanda encontrada</p>
+  </div>
+</div>
+
+<!-- PAGE LOGIN -->
+<div class="page" id="page-login">
+  <div style="display:flex;justify-content:center">
+    <div style="width:100%;max-width:400px">
+      <div class="card">
+        <div style="text-align:center;margin-bottom:24px">
+          <svg width="48" height="48" viewBox="0 0 28 28" fill="none" style="margin-bottom:8px">
+            <rect width="28" height="28" rx="6" fill="#1F6FEB"/>
+            <path d="M6 14h16M14 6v16M8 8l12 12M20 8L8 20" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+          <h2 style="font-size:17px;font-weight:600">Acesso Profissional</h2>
+          <p style="font-size:13px;color:var(--text2);margin-top:4px">Planejamento e Manutenção</p>
+        </div>
+        <div class="login-tabs">
+          <button class="login-tab active" id="tab-plan" onclick="switchLoginTab('planejamento')">Planejamento</button>
+          <button class="login-tab" id="tab-man" onclick="switchLoginTab('manutencao')">Manutenção</button>
+        </div>
+        <div id="login-form-area"></div>
+        <div id="logado-area" style="display:none">
+          <div style="background:var(--green-bg);border:1px solid #3FB95030;border-radius:var(--radius);padding:14px;text-align:center;margin-bottom:16px">
+            <p style="color:var(--green);font-size:13px;font-weight:500">✓ Conectado como <span id="logado-nome"></span></p>
+          </div>
+          <button class="btn btn-secondary" style="width:100%" onclick="fazerLogout()">Sair</button>
+          <button class="btn btn-secondary" style="width:100%;margin-top:8px" onclick="openChangePassword()">Alterar Senha</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</main>
+</div><!-- /#app -->
+
+<!-- ===== MODALS ===== -->
+
+<!-- NOVA / DUPLICAR -->
+<div class="modal-overlay" id="modal-nova">
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <h2 class="modal-title" id="nova-titulo">Nova Demanda</h2>
+      <button class="close-btn" onclick="closeModal('modal-nova')">
+        <svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor"><path d="M2 2l12 12M14 2L2 14"/></svg>
+      </button>
+    </div>
+    <div id="nova-body"></div>
+  </div>
+</div>
+
+<!-- DETALHE -->
+<div class="modal-overlay" id="modal-detalhe">
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <div>
+        <h2 class="modal-title" id="detalhe-titulo">Demanda</h2>
+        <p style="font-size:12px;color:var(--text3);margin-top:2px" id="detalhe-data"></p>
+      </div>
+      <button class="close-btn" onclick="closeModal('modal-detalhe')">
+        <svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor"><path d="M2 2l12 12M14 2L2 14"/></svg>
+      </button>
+    </div>
+    <div id="detalhe-content"></div>
+  </div>
+</div>
+
+<!-- ACEITE -->
+<div class="modal-overlay" id="modal-aceite">
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <h2 class="modal-title" id="aceite-titulo">Aceitar Demanda</h2>
+      <button class="close-btn" onclick="closeModal('modal-aceite')">
+        <svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor"><path d="M2 2l12 12M14 2L2 14"/></svg>
+      </button>
+    </div>
+    <div id="aceite-content"></div>
+  </div>
+</div>
+
+<!-- ANÁLISE -->
+<div class="modal-overlay" id="modal-analise">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 class="modal-title">Análise e Resolução</h2>
+      <button class="close-btn" onclick="closeModal('modal-analise')">
+        <svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor"><path d="M2 2l12 12M14 2L2 14"/></svg>
+      </button>
+    </div>
+    <div id="analise-content"></div>
+  </div>
+</div>
+
+<!-- SENHA -->
+<div class="modal-overlay" id="modal-senha">
+  <div class="modal" style="max-width:360px">
+    <div class="modal-header">
+      <h2 class="modal-title">Alterar Senha</h2>
+      <button class="close-btn" onclick="closeModal('modal-senha')">
+        <svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor"><path d="M2 2l12 12M14 2L2 14"/></svg>
+      </button>
+    </div>
+    <div id="senha-content"></div>
+  </div>
+</div>
+
+<!-- JS — ordem importa: config → db → auth → app -->
+<script src="js/config.js"></script>
+<script src="js/db.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
