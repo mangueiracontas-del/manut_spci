@@ -1,0 +1,35 @@
+name: CI - Testes da API
+
+# O fluxo vai rodar toda vez que você enviar código (push) para a branch main
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  executar-testes:
+    runs-on: ubuntu-latest
+
+    steps:
+    # 1. Baixa o código do repositório para a máquina virtual do GitHub
+    - name: Baixar código do repositório
+      uses: actions/checkout@v4
+
+    # 2. Instala o ambiente do Node.js na máquina do GitHub
+    - name: Configurar ambiente Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20' # Você pode mudar para a versão que usa no seu PC
+        cache: 'npm'
+
+    # 3. Instala as dependências do seu projeto (como o pacote do Supabase)
+    - name: Instalar dependências da API
+      run: npm install
+
+    # 4. Roda os testes usando os segredos salvos no seu GitHub
+    - name: Rodar testes da API
+      env:
+        SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+        SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+      run: npm test
