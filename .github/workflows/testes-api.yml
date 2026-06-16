@@ -11,24 +11,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    # 1. Atualizado para a versão v4 (usa Node moderno)
+    # 1. Atualizado para v4 (usa Node moderno)
     - name: Baixar código do repositório
       uses: actions/checkout@v4
 
-    # 2. Configura o ambiente diretamente com o Node.js 24
-    - name: Configurar ambiente Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '24'
-        cache: 'npm'
+    # 2. Configura a versão correta do CLI do Supabase
+    - name: Configurar Supabase CLI
+      uses: supabase/setup-cli@v1.5.0
 
-    # 3. Se você usar a ferramenta oficial do Supabase CLI, use a versão v1.5.0 ou superior
-    # - name: Configurar Supabase CLI
-    #   uses: supabase/setup-cli@v1.5.0 
-
-    - name: Instalar dependências da API
-      run: npm install
-
+    # 3. Executa os seus testes com as variáveis de ambiente
     - name: Rodar testes da API
       env:
         SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
