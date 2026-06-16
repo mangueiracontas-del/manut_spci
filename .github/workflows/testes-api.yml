@@ -11,16 +11,21 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    # 1. Atualizado para v4 (usa Node moderno)
     - name: Baixar código do repositório
       uses: actions/checkout@v4
 
-    # 2. Configura a versão correta do CLI do Supabase
-    - name: Configurar Supabase CLI
-      uses: supabase/setup-cli@v1.5.0
+    - name: Configurar ambiente Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '24'
 
-    # 3. Executa os seus testes com as variáveis de ambiente
+    # IMPORTANTE: Adicionamos o "working-directory" nos comandos abaixo
+    - name: Instalar dependências da API
+      working-directory: ./SUA_PASTA_AQUI  # <-- Troque pelo nome da sua pasta
+      run: npm install
+
     - name: Rodar testes da API
+      working-directory: ./SUA_PASTA_AQUI  # <-- Troque pelo nome da sua pasta
       env:
         SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
         SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
