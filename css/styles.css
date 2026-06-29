@@ -198,7 +198,7 @@ tbody tr:hover td{background:var(--bg3);cursor:pointer}
   color: var(--text1);
   font-size: 13px;
   cursor: pointer;
-  opacity: 0.1;
+  opacity: 0.85;
   white-space: nowrap;
 }
 .multi-select-trigger:hover {
@@ -207,7 +207,7 @@ tbody tr:hover td{background:var(--bg3);cursor:pointer}
 .multi-select-trigger .icon {
   width: 14px;
   height: 12px;
-  opacity: 0.1;
+  opacity: 0.85;
   flex-shrink: 0;
 }
 .multi-select-dropdown {
@@ -221,7 +221,7 @@ tbody tr:hover td{background:var(--bg3);cursor:pointer}
   border-radius: var(--radius);
   box-shadow: var(--shadow);
   padding: 9px;
-  opacity: 0.1;
+  opacity: 0.85;
   display: none;
 }
 .multi-select.open .multi-select-dropdown {
@@ -237,7 +237,7 @@ tbody tr:hover td{background:var(--bg3);cursor:pointer}
   cursor: pointer;
   color: var(--text1);
   white-space: nowrap;
-  opacity: 0.1;
+  opacity: 0.85;
 }
 .multi-select-option:hover {
   background: var(--hover);
