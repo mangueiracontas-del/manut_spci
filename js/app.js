@@ -5,29 +5,11 @@
 let allDemandas      = [];
 let filteredDemandas = [];
 let editingId        = null;
-let filterBarVisible = false;
 
 // ---- ID ----
 function gerarID() {
   const d = new Date();
   return 'DM-' + d.getFullYear() + String(d.getMonth() + 1).padStart(2, '0') + '-' + Math.floor(1000 + Math.random() * 9000);
-}
-
-// ---- Filter Toggle ----
-function toggleFilterBar() {
-  const bar = document.getElementById('filter-bar');
-  const label = document.getElementById('filter-toggle-label');
-  const btn = document.getElementById('filter-toggle-btn');
-  
-  filterBarVisible = !filterBarVisible;
-  bar.style.display = filterBarVisible ? 'flex' : 'none';
-  label.textContent = filterBarVisible ? 'Ocultar Filtros' : 'Mostrar Filtros';
-  
-  if (filterBarVisible) {
-    btn.classList.add('active');
-  } else {
-    btn.classList.remove('active');
-  }
 }
 
 // ---- Carregar ----
@@ -178,10 +160,10 @@ function renderStats() {
   const grid = document.getElementById('stats-grid');
   grid.innerHTML = `
     <div class="stat-card"><div class="stat-label">Total</div><div class="stat-value">${d.length}</div><div class="stat-sub">demandas</div></div>
-    <div class="stat-card"><div class="stat-label">Abertas</div><div class="stat-value" style="color:var(--blue)">${d.filter(x=>!x.status||x.status==='Aberta').length}</div><div class="stat-sub">ativas</div></div>
-    <div class="stat-card"><div class="stat-label">Em Análise</div><div class="stat-value" style="color:var(--purple)">${d.filter(x=>x.status==='Em Análise').length}</div><div class="stat-sub">analisando</div></div>
+    <div class="stat-card"><div class="stat-label">Abertas</div><div class="stat-value" style="color:var(--blue)">${d.filter(x=>!x.status||x.status==='Aberta').length}</div><div class="stat-sub">aguardando</div></div>
+    <div class="stat-card"><div class="stat-label">Em Análise</div><div class="stat-value" style="color:var(--purple)">${d.filter(x=>x.status==='Em Análise').length}</div><div class="stat-sub">planejadas</div></div>
     <div class="stat-card"><div class="stat-label">Em Andamento</div><div class="stat-value" style="color:var(--orange)">${d.filter(x=>x.status==='Em Andamento').length}</div><div class="stat-sub">em execução</div></div>
-    <div class="stat-card"><div class="stat-label">Críticos</div><div class="stat-value" style="color:var(--red)">${d.filter(x=>x.situacao?.includes('Crítico')).length}</div><div class="stat-sub">urgentes</div></div>
+    <div class="stat-card"><div class="stat-label">Críticos</div><div class="stat-value" style="color:var(--red)">${d.filter(x=>x.situacao?.includes('Crítico')).length}</div><div class="stat-sub">sistema parado</div></div>
     <div class="stat-card"><div class="stat-label">Concluídas</div><div class="stat-value" style="color:var(--green)">${d.filter(x=>x.status==='Concluída').length}</div><div class="stat-sub">resolvidas</div></div>
   `;
 }
@@ -250,7 +232,7 @@ function openNovaDemanda(sourceId) {
       <label class="form-label">Foto do Defeito</label>
       <div class="photo-upload">
         <input type="file" accept="image/*" id="nd-foto" onchange="previewFoto()">
-        <svg width="28" height="28" viewBox="0 0 32 32" fill="none" style="margin-bottom:6px;opacity:.4"><rect x="2" y="6" width="28" height="20" rx="3" stroke="currentColor" stroke-width="1.5"/><circle cx="10" cy="13" r="2" stroke="currentColor" stroke-width="1.5"/><path d="M2 20l8-10 6 7 8-5v8H2z" stroke="currentColor" stroke-width="1.5" fill="none"/></svg>
+        <svg width="28" height="28" viewBox="0 0 32 32" fill="none" style="margin-bottom:6px;opacity:.4"><rect x="2" y="6" width="28" height="20" rx="3" stroke="currentColor" stroke-width="1.5"/><circle cx="16" cy="16" r="5" stroke="currentColor" stroke-width="1.5"/><path d="M11 6l2-4h6l2 4" stroke="currentColor" stroke-width="1.5" /></svg>
         <p style="color:var(--text3);font-size:12px">Clique ou arraste uma imagem</p>
         <img id="foto-preview" class="photo-preview-img" alt="preview">
       </div>
@@ -346,7 +328,7 @@ function verDetalhe(id) {
     </div>
     <div class="detail-field" style="margin-top:8px"><label>Descrição</label>
       <p style="background:var(--bg3);padding:12px;border-radius:var(--radius);margin-top:4px;line-height:1.7">${esc(d.descricao)}</p></div>
-    ${d.comentarioPlan?`<div class="comment-callout"><div style="font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--blue);margin-bottom:4px;font-weight:600">💬 Comentário do Planejamento</div><p>${esc(d.comentarioPlan)}</p></div>`:''}
+    ${d.comentarioPlan?`<div class="comment-callout"><div style="font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--blue);margin-bottom:4px;font-weight:600">💬 Comentário do Planejamento</div><p style="font-size:13px;color:var(--text2)">${esc(d.comentarioPlan)}</p></div>`:''}
     ${d.foto?`<div style="margin-top:12px"><img src="${d.foto}" style="max-width:100%;border-radius:var(--radius);max-height:260px;object-fit:contain;background:var(--bg3)" alt="foto"></div>`:''}
     ${d.analise||d.resolucao||d.om?`<div class="analysis-section">
       <h3 style="font-size:12px;font-weight:600;margin-bottom:12px;color:var(--text2);text-transform:uppercase;letter-spacing:.04em">Análise e Resolução</h3>
