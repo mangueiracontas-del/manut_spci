@@ -81,7 +81,7 @@ function aplicarFiltros() {
 }
 
 function limparFiltros() {
-  ['f-busca','f-data-ini','f-data-fim','f-site','f-local','f-situacao','f-prioridade','f-status','f-equipe','f-solicitante']
+  ['f-busca','f-data-ini','f-data-fim','f-site','f-local','f-situacao','f-prioridade','f-equipe','f-solicitante']
     .forEach(id => document.getElementById(id).value = '');
     document.querySelectorAll('#f-status input[type="checkbox"]').forEach(cb => cb.checked = false);
     document.querySelector('#f-status .multi-select-label').textContent = 'Todos status';
