@@ -8,10 +8,12 @@
 // 2. Vá em Settings > API
 // 3. Copie a "Project URL" e a "anon public" key
 //
-import { createClient } from '@supabase/supabase-js'
-const supabaseUrl = 'https://llnecvfzboqqgspvbibg.supabase.co'
-const supabaseKey = 'sb_publishable_b8LkKFq6_pKoMsPbXzguoA_VAbpZIT4'
-// Define variáveis globais para uso em outros arquivos
-window.SUPABASE_URL = supabaseUrl
-window.SUPABASE_ANON = supabaseKey
-const supabase = createClient(supabaseUrl, supabaseKey)
+
+// Remove o import ES6 e usa script tag do CDN em seu lugar
+
+const SUPABASE_URL = 'https://llnecvfzboqqgspvbibg.supabase.co'
+const SUPABASE_ANON = 'sb_publishable_b8LkKFq6_pKoMsPbXzguoA_VAbpZIT4'
+
+// Define no window para garantir acesso global
+window.SUPABASE_URL = SUPABASE_URL
+window.SUPABASE_ANON = SUPABASE_ANON
