@@ -189,7 +189,7 @@ tbody tr:hover td{background:var(--bg3);cursor:pointer}
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
+  gap: 12px;
   width: 100%;
   padding: 9px 8px;
   background: var(--input-bg);
@@ -205,8 +205,8 @@ tbody tr:hover td{background:var(--bg3);cursor:pointer}
 }
 .multi-select-trigger .icon {
   width: 14px;
-  height: 18px;
-  opacity: 4;
+  height: 12px;
+  opacity: 0.4;
   flex-shrink: 0;
 }
 .multi-select-dropdown {
@@ -228,7 +228,7 @@ tbody tr:hover td{background:var(--bg3);cursor:pointer}
 .multi-select-option {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
   padding: 9px 8px;
   border-radius: 8px;
   font-size: 16px;
