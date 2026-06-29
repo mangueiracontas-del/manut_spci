@@ -65,7 +65,16 @@
   <div class="stats-grid" id="stats-grid"></div>
 
   <div class="card" style="margin-bottom:16px">
-    <div class="filter-bar">
+    <!-- Botão Filtro -->
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+      <button class="btn btn-secondary btn-sm" id="filter-toggle-btn" onclick="toggleFilterBar()">
+        <svg class="icon" viewBox="0 0 16 16" fill="currentColor"><path d="M2 3h12M4 8h8M6 13h4"/></svg>
+        <span id="filter-toggle-label">Mostrar Filtros</span>
+      </button>
+    </div>
+
+    <!-- Barra de Filtros (inicialmente oculta) -->
+    <div class="filter-bar" id="filter-bar" style="display:none">
       <div class="search-box">
         <svg viewBox="0 0 16 16" fill="currentColor"><path d="M6 1a5 5 0 100 10A5 5 0 006 1zm4.32 4.32l4.36 4.36-1.41 1.41-4.36-4.36A5 5 0 0010.32 5.32z"/></svg>
         <input type="text" class="form-control" placeholder="Buscar ID, TAG, local, OM..." oninput="aplicarFiltros()" id="f-busca">
