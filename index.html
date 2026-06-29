@@ -7,7 +7,6 @@
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/styles.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<!-- Adicione isso antes dos seus scripts -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
@@ -26,6 +25,10 @@
     <button class="nav-btn active" onclick="showPage('demandas')" id="nav-demandas">
       <svg class="icon" viewBox="0 0 16 16" fill="currentColor"><path d="M2 2h5v5H2zm7 0h5v5H9zm0 7h5v5H9zM2 9h5v5H2z"/></svg>
       <span>Demandas</span>
+    </button>
+    <button class="nav-btn" onclick="showPage('configuracao')" id="nav-config" style="display:none">
+      <svg class="icon" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1a3 3 0 00-3 3v2H2v8h12V6h-3V4a3 3 0 00-3-3zm0 2a1 1 0 011 1v2H7V4a1 1 0 011-1z"/></svg>
+      <span>Configuração</span>
     </button>
   </nav>
   <div class="topbar-right">
@@ -149,6 +152,44 @@
   </div>
 </div>
 
+<!-- PAGE CONFIGURAÇÃO -->
+<div class="page" id="page-configuracao">
+  <div class="page-header">
+    <div>
+      <h1 style="font-size:20px;font-weight:600">Configurações</h1>
+      <p style="color:var(--text2);font-size:13px;margin-top:2px">Gerencie sites e locais</p>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;max-width:1200px">
+    
+    <!-- SITES -->
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+        <h2 style="font-size:16px;font-weight:600">Sites</h2>
+        <button class="btn btn-primary btn-sm" onclick="openNovoSite()">
+          <svg class="icon" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1v14M1 8h14"/></svg>
+          Novo
+        </button>
+      </div>
+      <div id="sites-list" style="max-height:400px;overflow-y:auto"></div>
+    </div>
+
+    <!-- LOCAIS -->
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+        <h2 style="font-size:16px;font-weight:600">Locais</h2>
+        <button class="btn btn-primary btn-sm" onclick="openNovoLocal()">
+          <svg class="icon" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1v14M1 8h14"/></svg>
+          Novo
+        </button>
+      </div>
+      <div id="locais-list" style="max-height:400px;overflow-y:auto"></div>
+    </div>
+
+  </div>
+</div>
+
 <!-- PAGE LOGIN -->
 <div class="page" id="page-login">
   <div style="display:flex;justify-content:center">
@@ -194,6 +235,46 @@
       </button>
     </div>
     <div id="nova-body"></div>
+  </div>
+</div>
+
+<!-- NOVO SITE -->
+<div class="modal-overlay" id="modal-novo-site">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 class="modal-title">Novo Site</h2>
+      <button class="close-btn" onclick="closeModal('modal-novo-site')">
+        <svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor"><path d="M2 2l12 12M14 2L2 14"/></svg>
+      </button>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Nome do Site *</label>
+      <input class="form-control" id="novo-site-nome" placeholder="Ex: ETE Norte" required>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end">
+      <button class="btn btn-secondary" onclick="closeModal('modal-novo-site')">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarNovoSite()">Cadastrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- NOVO LOCAL -->
+<div class="modal-overlay" id="modal-novo-local">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 class="modal-title">Novo Local</h2>
+      <button class="close-btn" onclick="closeModal('modal-novo-local')">
+        <svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor"><path d="M2 2l12 12M14 2L2 14"/></svg>
+      </button>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Nome do Local *</label>
+      <input class="form-control" id="novo-local-nome" placeholder="Ex: Blower A — Sala 01" required>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end">
+      <button class="btn btn-secondary" onclick="closeModal('modal-novo-local')">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarNovoLocal()">Cadastrar</button>
+    </div>
   </div>
 </div>
 
