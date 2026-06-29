@@ -32,7 +32,7 @@ const idbGet    = (s,k) => new Promise((r,j)=>{ const tx=idb.transaction(s,'read
 function sbHeaders() {
   return {
     'Content-Type': 'application/json',
-    'apikey': wwindow.SUPABASE_ANON,
+    'apikey': window.SUPABASE_ANON,
     'Authorization': 'Bearer ' + window.SUPABASE_ANON,
     'Prefer': 'return=representation'
   };
