@@ -32,14 +32,14 @@ const idbGet    = (s,k) => new Promise((r,j)=>{ const tx=idb.transaction(s,'read
 function sbHeaders() {
   return {
     'Content-Type': 'application/json',
-    'apikey': SUPABASE_ANON,
-    'Authorization': 'Bearer ' + SUPABASE_ANON,
+    'apikey': wwindow.SUPABASE_ANON,
+    'Authorization': 'Bearer ' + window.SUPABASE_ANON,
     'Prefer': 'return=representation'
   };
 }
 
 async function sbSelect(table, params = '') {
-  const r = await fetch(`${SUPABASE_URL}/rest/v1/${table}?${params}`, {
+  const r = await fetch(`${window.SUPABASE_URL}/rest/v1/${table}?${params}`, {
     headers: sbHeaders()
   });
   if (!r.ok) throw new Error(`Supabase SELECT erro: ${r.status}`);
@@ -47,7 +47,7 @@ async function sbSelect(table, params = '') {
 }
 
 async function sbUpsert(table, row) {
-  const r = await fetch(`${SUPABASE_URL}/rest/v1/${table}`, {
+  const r = await fetch(`${window.SUPABASE_URL}/rest/v1/${table}`, {
     method: 'POST',
     headers: { ...sbHeaders(), 'Prefer': 'resolution=merge-duplicates,return=representation' },
     body: JSON.stringify(row)
@@ -57,7 +57,7 @@ async function sbUpsert(table, row) {
 }
 
 async function sbDelete(table, id) {
-  const r = await fetch(`${SUPABASE_URL}/rest/v1/${table}?id=eq.${encodeURIComponent(id)}`, {
+  const r = await fetch(`${window.SUPABASE_URL}/rest/v1/${table}?id=eq.${encodeURIComponent(id)}`, {
     method: 'DELETE',
     headers: sbHeaders()
   });
