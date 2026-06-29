@@ -192,8 +192,8 @@ tbody tr:hover td{background:var(--bg3);cursor:pointer}
   gap: 12px;
   width: 100%;
   padding: 9px 8px;
-  background: var(--input-bg);
-  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.1); 
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: var(--radius);
   color: var(--text1);
   font-size: 13px;
