@@ -84,10 +84,26 @@
         <option value="">Prioridade</option>
         <option>P0</option><option>P1</option><option>P2</option><option>P3</option><option>P4</option><option>P5</option>
       </select>
+      <!-- substituindo este
       <select class="form-control" id="f-status" onchange="aplicarFiltros()">
         <option value="">Todos status</option>
         <option>Aberta</option><option>Em Análise</option><option>Em Andamento</option><option>Concluída</option><option>Cancelada</option>
       </select>
+      -->
+      <!-- por este-->
+      <div class="multi-select" id="f-status">
+  <button class="multi-select-trigger" onclick="toggleMultiSelect('f-status')" type="button">
+    <span class="multi-select-label">Todos status</span>
+    <svg class="icon" viewBox="0 0 16 16" fill="currentColor"><path d="M4 6l4 4 4-4"/></svg>
+  </button>
+  <div class="multi-select-dropdown">
+    <label class="multi-select-option"><input type="checkbox" value="Aberta" onchange="aplicarFiltros()"> Aberta</label>
+    <label class="multi-select-option"><input type="checkbox" value="Em Análise" onchange="aplicarFiltros()"> Em Análise</label>
+    <label class="multi-select-option"><input type="checkbox" value="Em Andamento" onchange="aplicarFiltros()"> Em Andamento</label>
+    <label class="multi-select-option"><input type="checkbox" value="Concluída" onchange="aplicarFiltros()"> Concluída</label>
+  </div>
+</div>
+      <!--até aqui -->
       <select class="form-control" id="f-equipe" onchange="aplicarFiltros()">
         <option value="">Todas as equipes</option>
         <option>Manutenção Corretiva</option><option>Manutenção Preventiva</option><option>Inspeção</option><option>PCM</option>
