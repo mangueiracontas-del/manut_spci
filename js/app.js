@@ -612,7 +612,7 @@ async function init() {
   await atualizarBadgeOffline();
   renderLoginForm('planejamento');
 }
-init();
+
 
 // ---- Filtro -----
 function toggleMultiSelect(id) {
@@ -642,3 +642,6 @@ function getMultiSelectValues(id) {
   
   return values;
 }
+
+init();
+
