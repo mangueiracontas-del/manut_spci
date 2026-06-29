@@ -5,7 +5,7 @@
 let allDemandas      = [];
 let filteredDemandas = [];
 let editingId        = null;
-// let filterBarVisible = false;
+let filterBarVisible = false;
 
 // ---- ID ----
 function gerarID() {
