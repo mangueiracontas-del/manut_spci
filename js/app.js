@@ -5,29 +5,11 @@
 let allDemandas      = [];
 let filteredDemandas = [];
 let editingId        = null;
-let filterBarVisible = false;
 
 // ---- ID ----
 function gerarID() {
   const d = new Date();
   return 'DM-' + d.getFullYear() + String(d.getMonth() + 1).padStart(2, '0') + '-' + Math.floor(1000 + Math.random() * 9000);
-}
-
-// ---- Filter Toggle ----
-function toggleFilterBar() {
-  const bar = document.getElementById('filter-bar');
-  const label = document.getElementById('filter-toggle-label');
-  const btn = document.getElementById('filter-toggle-btn');
-  
-  filterBarVisible = !filterBarVisible;
-  bar.style.display = filterBarVisible ? 'flex' : 'none';
-  label.textContent = filterBarVisible ? 'Ocultar Filtros' : 'Mostrar Filtros';
-  
-  if (filterBarVisible) {
-    btn.classList.add('active');
-  } else {
-    btn.classList.remove('active');
-  }
 }
 
 // ---- Carregar ----
