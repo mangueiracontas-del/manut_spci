@@ -47,7 +47,9 @@ function aplicarFiltros() {
   const local    = document.getElementById('f-local').value;
   const situacao = document.getElementById('f-situacao').value;
   const prio     = document.getElementById('f-prioridade').value;
-  const status   = document.getElementById('f-status').value;
+  // const status   = document.getElementById('f-status').value;
+  const statusSelecionados = getMultiSelectValues('f-status');
+  
   const equipe   = document.getElementById('f-equipe').value;
   const sol      = document.getElementById('f-solicitante').value;
 
@@ -60,7 +62,9 @@ function aplicarFiltros() {
     if (local && d.local !== local) return false;
     if (situacao && d.situacao !== situacao) return false;
     if (prio && d.prioridade !== prio) return false;
-    if (status && st !== status) return false;
+    // if (status && st !== status) return false;
+    if (statusSelecionados.length > 0 && !statusSelecionados.includes(d.status)) return false;
+    
     if (equipe && d.equipe !== equipe) return false;
     if (sol && d.solicitante !== sol) return false;
     return true;
@@ -79,6 +83,8 @@ function aplicarFiltros() {
 function limparFiltros() {
   ['f-busca','f-data-ini','f-data-fim','f-site','f-local','f-situacao','f-prioridade','f-status','f-equipe','f-solicitante']
     .forEach(id => document.getElementById(id).value = '');
+    document.querySelectorAll('#f-status input[type="checkbox"]').forEach(cb => cb.checked = false);
+    document.querySelector('#f-status .multi-select-label').textContent = 'Todos status';
   aplicarFiltros();
 }
 
@@ -607,3 +613,32 @@ async function init() {
   renderLoginForm('planejamento');
 }
 init();
+
+// ---- Filtro -----
+function toggleMultiSelect(id) {
+  document.getElementById(id).classList.toggle('open');
+}
+
+// Fecha dropdowns ao clicar fora
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.multi-select')) {
+    document.querySelectorAll('.multi-select.open').forEach(el => el.classList.remove('open'));
+  }
+});
+function getMultiSelectValues(id) {
+  const container = document.getElementById(id);
+  const checkboxes = container.querySelectorAll('input[type="checkbox"]:checked');
+  const values = Array.from(checkboxes).map(cb => cb.value);
+  
+  // Atualiza label do trigger
+  const label = container.querySelector('.multi-select-label');
+  if (values.length === 0) {
+    label.textContent = 'Todos status';
+  } else if (values.length === 1) {
+    label.textContent = values[0];
+  } else {
+    label.textContent = `${values.length} selecionados`;
+  }
+  
+  return values;
+}
