@@ -26,40 +26,15 @@
       <svg class="icon" viewBox="0 0 16 16" fill="currentColor"><path d="M2 2h5v5H2zm7 0h5v5H9zm0 7h5v5H9zM2 9h5v5H2z"/></svg>
       <span>Demandas</span>
     </button>
+    <button class="nav-btn" onclick="showPage('login')" id="nav-login">
+      <svg class="icon" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1a3 3 0 100 6A3 3 0 008 1zm0 8c-3.3 0-6 1.5-6 3v1h12v-1c0-1.5-2.7-3-6-3z"/></svg>
+      <span id="user-nav-label">Entrar</span>
+    </button>
   </nav>
   <div class="topbar-right">
     <div class="offline-badge" id="offline-badge">
       <span class="pending-dot"></span> Offline — <span id="pending-count">0</span> pendente(s)
     </div>
-    
-    <!-- User Menu (quando logado) -->
-    <div class="user-menu" id="user-menu" style="display:none">
-      <button class="user-menu-btn" onclick="toggleUserMenu()">
-        <svg class="icon" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1a3 3 0 100 6A3 3 0 008 1zm0 8c-3.3 0-6 1.5-6 3v1h12v-1c0-1.5-2.7-3-6-3z"/></svg>
-        <span id="user-menu-name">Usuário</span>
-        <svg class="icon" viewBox="0 0 16 16" fill="currentColor" style="width:12px"><path d="M4 6l4 4 4-4"/></svg>
-      </button>
-      <div class="user-menu-dropdown" id="user-menu-dropdown">
-        <div class="user-menu-header">
-          <span id="user-menu-role" style="font-size:11px;color:var(--text3)">Planejamento</span>
-        </div>
-        <button class="user-menu-item" onclick="openChangePassword();closeUserMenu()">
-          <svg class="icon" viewBox="0 0 16 16" fill="currentColor"><path d="M8 11a1 1 0 110-2 1 1 0 010 2zm0-5a1 1 0 110-2 1 1 0 010 2z"/></svg>
-          Alterar Senha
-        </button>
-        <hr class="user-menu-sep">
-        <button class="user-menu-item user-menu-logout" onclick="fazerLogout();closeUserMenu()">
-          <svg class="icon" viewBox="0 0 16 16" fill="currentColor"><path d="M2 2h5v2H4v8h8V7h2v7a1 1 0 01-1 1H3a1 1 0 01-1-1V3a1 1 0 011-1zm9-2v4H9V1h2z"/></svg>
-          Sair
-        </button>
-      </div>
-    </div>
-
-    <!-- Login Button (quando não logado) -->
-    <button class="btn btn-secondary btn-sm" id="login-btn" onclick="showPage('login')">
-      <svg class="icon" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1a3 3 0 100 6A3 3 0 008 1zm0 8c-3.3 0-6 1.5-6 3v1h12v-1c0-1.5-2.7-3-6-3z"/></svg>
-      <span>Entrar</span>
-    </button>
   </div>
 </header>
 
