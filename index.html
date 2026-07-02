@@ -50,6 +50,13 @@
       <p style="color:var(--text2);font-size:13px;margin-top:2px">Gerencie e acompanhe todas as solicitações</p>
     </div>
     <div class="page-header-actions">
+      <button id="btn-toggle-filtros" class="btn btn-secondary btn-sm" aria-expanded="false" aria-controls="filtros-card">
+        <span class="btn-icon-left" aria-hidden="true">
+          <svg class="icon-filter" viewBox="0 0 16 16" width="14" height="14" fill="currentColor"><path d="M3 4h10l-4 5v3l-2 1v-4L3 4z"/></svg>
+          <svg class="icon-close" viewBox="0 0 16 16" width="14" height="14" fill="currentColor" style="display:none"><path d="M3 4h10l-4 5v3l-2 1v-4L3 4z"/></svg>
+        </span>
+        <span class="btn-label">Mostrar filtros</span>
+      </button>
       <button class="btn btn-secondary btn-sm" onclick="exportExcel()">
         <svg class="icon" viewBox="0 0 16 16" fill="currentColor"><path d="M2 2h8l4 4v8H2V2zm7-1v5h5M5 9l2 2-2 2M11 9l-2 2 2 2"/></svg>
         Exportar Excel
@@ -63,9 +70,9 @@
 
   <div class="stats-grid" id="stats-grid"></div>
 
-  <div class="card" style="margin-bottom:16px">
+  <div class="card" style="margin-bottom:16px" id="filtros-card">
     <div class="filter-bar">
-        <div class="search-box">
+        <div class="search-box" width=130px>
         <svg viewBox="0 0 16 16" fill="currentColor"><path d="M6 1a5 5 0 100 10A5 5 0 006 1zm4.32 4.32l4.36 4.36-1.41 1.41-4.36-4.36A5 5 0 0010.32 5.32z"/></svg>
         <input type="text" class="form-control" placeholder="Buscar ID, TAG, local, OM..." oninput="aplicarFiltros()" id="f-busca">
       </div>
@@ -74,7 +81,7 @@
       <select class="form-control" id="f-site" onchange="aplicarFiltros()"><option value="">Todos os sites</option></select>
       <select class="form-control" id="f-local" onchange="aplicarFiltros()"><option value="">Todos os locais</option></select>
       <select class="form-control" id="f-situacao" onchange="aplicarFiltros()">
-        <option value="">Todas situações</option>
+        <option value="">Situações</option>
         <option value="Sistema parado - Crítico">Crítico</option>
         <option value="Sistema parcialmente parado - Prioritário">Prioritário</option>
         <option value="Sistema com Restrição - Moderado">Moderado</option>
@@ -84,19 +91,19 @@
         <option value="">Prioridade</option>
         <option>P0</option><option>P1</option><option>P2</option><option>P3</option><option>P4</option><option>P5</option>
       </select>
-      <!-- substituindo este
-      <select class="form-control" id="f-status" onchange="aplicarFiltros()">
-        <option value="">Todos status</option>
-        <option>Aberta</option><option>Em Análise</option><option>Em Andamento</option><option>Concluída</option><option>Cancelada</option>
-      </select>
-      -->
+        <!-- substituindo este
+          <select class="form-control" id="f-status" onchange="aplicarFiltros()">
+            <option value="">Todos status</option>
+            <option>Aberta</option><option>Em Análise</option><option>Em Andamento</option><option>Concluída</option><option>Cancelada</option>
+          </select>
+        -->
       <!-- por este-->
       <div class="multi-select" id="f-status">
-  <button class="multi-select-trigger" onclick="toggleMultiSelect('f-status')" type="button">
-    <span class="multi-select-label">Status</span>
-    <svg class="icon" viewBox="0 0 16 16" fill="currentColor"><path d="M4 6l4 4 4-4"/></svg>
-  </button>
-  <div class="multi-select-dropdown">
+         <button class="multi-select-trigger" onclick="toggleMultiSelect('f-status')" type="button">
+            <span class="multi-select-label">Status</span>
+            <svg class="icon" viewBox="0 0 16 16" fill="currentColor"><path d="M4 6l4 4 4-4"/></svg>
+          </button>
+      <div class="multi-select-dropdown">
     <label class="multi-select-option"><input type="checkbox" value="Aberta" onchange="aplicarFiltros()"> Aberta</label>
     <label class="multi-select-option"><input type="checkbox" value="Em Análise" onchange="aplicarFiltros()"> Em Análise</label>
     <label class="multi-select-option"><input type="checkbox" value="Em Andamento" onchange="aplicarFiltros()"> Em Andamento</label>
@@ -104,9 +111,9 @@
   </div>
 </div>
 
-<div class="container">
+<!-- <div class="container">
   <div id="select" ng-model=""></div>
-</div>
+</div> -->
       
       <!--até aqui -->
       <select class="form-control" id="f-equipe" onchange="aplicarFiltros()">

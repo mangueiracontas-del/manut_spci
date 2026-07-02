@@ -34,9 +34,9 @@ function popularFiltros() {
   const sols   = [...new Set(allDemandas.map(d => d.solicitante).filter(Boolean))].sort();
   const fs = document.getElementById('f-site'), fl = document.getElementById('f-local'), fso = document.getElementById('f-solicitante');
   const sv = fs.value, lv = fl.value, solv = fso.value;
-  fs.innerHTML  = '<option value="">Todos os sites</option>' + sites.map(s  => `<option${s===sv?' selected':''}>${s}</option>`).join('');
-  fl.innerHTML  = '<option value="">Todos os locais</option>' + locais.map(l => `<option${l===lv?' selected':''}>${l}</option>`).join('');
-  fso.innerHTML = '<option value="">Todos solicitantes</option>' + sols.map(s => `<option${s===solv?' selected':''}>${s}</option>`).join('');
+  fs.innerHTML  = '<option value="">Sites</option>' + sites.map(s  => `<option${s===sv?' selected':''}>${s}</option>`).join('');
+  fl.innerHTML  = '<option value="">Locais</option>' + locais.map(l => `<option${l===lv?' selected':''}>${l}</option>`).join('');
+  fso.innerHTML = '<option value="">Solicitantes</option>' + sols.map(s => `<option${s===solv?' selected':''}>${s}</option>`).join('');
 }
 
 function aplicarFiltros() {
@@ -84,7 +84,7 @@ function limparFiltros() {
   ['f-busca','f-data-ini','f-data-fim','f-site','f-local','f-situacao','f-prioridade','f-equipe','f-solicitante']
     .forEach(id => document.getElementById(id).value = '');
     document.querySelectorAll('#f-status input[type="checkbox"]').forEach(cb => cb.checked = false);
-    document.querySelector('#f-status .multi-select-label').textContent = 'Todos status';
+    document.querySelector('#f-status .multi-select-label').textContent = 'Status';
   aplicarFiltros();
 }
 
@@ -587,9 +587,56 @@ function openModal(id)  { document.getElementById(id).classList.add('open'); }
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 
 document.addEventListener('DOMContentLoaded', () => {
-  document.querySelectorAll('.modal-overlay').forEach(m => {
-    m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
+  //document.querySelectorAll('.modal-overlay').forEach(m => {
+  //  m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
+  //});
+
+
+
+  const btn = document.getElementById('btn-toggle-filtros');
+  const card = document.getElementById('filtros-card');
+  if (!btn || !card) return;
+
+  const iconFilter = btn.querySelector('.icon-filter');
+  const iconClose = btn.querySelector('.icon-close');
+  const label = btn.querySelector('.btn-label');
+
+  // Função que aplica estado (true = aberto)
+  function applyState(isOpen) {
+    // controla o card (compatível com suas classes)
+    if (isOpen) {
+      card.classList.remove('collapsed', 'hidden');
+    } else {
+      card.classList.add('collapsed', 'hidden');
+    }
+
+    // atualiza botão e ícones
+    btn.setAttribute('aria-expanded', String(isOpen));
+    if (label) label.textContent = isOpen ? 'Ocultar filtros' : 'Mostrar filtros';
+    if (iconFilter) iconFilter.style.display = isOpen ? 'none' : 'inline-block';
+    if (iconClose) iconClose.style.display = isOpen ? 'inline-block' : 'none';
+  }
+
+  // estado inicial (fechado)
+  applyState(false);
+
+  // clique: alterna explicitamente
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const isOpen = btn.getAttribute('aria-expanded') === 'true';
+    applyState(!isOpen);
   });
+
+  // opcional: fechar ao clicar fora
+  document.addEventListener('click', (ev) => {
+    if (btn.contains(ev.target)) return;
+    if (!card.classList.contains('collapsed') && !card.contains(ev.target)) {
+      applyState(false);
+    }
+  });
+
+
+
 });
 
 function toast(msg, type = 'info') {
@@ -633,7 +680,7 @@ function getMultiSelectValues(id) {
   // Atualiza label do trigger
   const label = container.querySelector('.multi-select-label');
   if (values.length === 0) {
-    label.textContent = 'Todos status';
+    label.textContent = 'Status';
   } else if (values.length === 1) {
     label.textContent = values[0];
   } else {
@@ -642,6 +689,15 @@ function getMultiSelectValues(id) {
   
   return values;
 }
+ // Ocultar/mostrar painel de filtros
+  const btn = document.getElementById('btn-toggle-filtros');
+  const panel = document.getElementById('filtros-card');
+
+  btn.addEventListener('click', () => {
+    const hidden = card.classList.toggle('hidden');
+    btn.setAttribute('aria-expanded', String(!hidden));
+    btn.textContent = hidden ? 'Mostrar filtros' : 'Ocultar filtros';
+  });
 
 init();
 
