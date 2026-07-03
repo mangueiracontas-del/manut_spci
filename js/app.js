@@ -47,7 +47,6 @@ function aplicarFiltros() {
   const local    = document.getElementById('f-local').value;
   const situacao = document.getElementById('f-situacao').value;
   const prio     = document.getElementById('f-prioridade').value;
-  // const status   = document.getElementById('f-status').value;
   const statusSelecionados = getMultiSelectValues('f-status');
   
   const equipe   = document.getElementById('f-equipe').value;
@@ -62,7 +61,6 @@ function aplicarFiltros() {
     if (local && d.local !== local) return false;
     if (situacao && d.situacao !== situacao) return false;
     if (prio && d.prioridade !== prio) return false;
-    // if (status && st !== status) return false;
     if (statusSelecionados.length > 0 && !statusSelecionados.includes(d.status)) return false;
     
     if (equipe && d.equipe !== equipe) return false;
@@ -166,10 +164,10 @@ function renderStats() {
   const grid = document.getElementById('stats-grid');
   grid.innerHTML = `
     <div class="stat-card"><div class="stat-label">Total</div><div class="stat-value">${d.length}</div><div class="stat-sub">demandas</div></div>
-    <div class="stat-card"><div class="stat-label">Abertas</div><div class="stat-value" style="color:var(--blue)">${d.filter(x=>!x.status||x.status==='Aberta').length}</div><div class="stat-sub">aguardando</div></div>
-    <div class="stat-card"><div class="stat-label">Em Análise</div><div class="stat-value" style="color:var(--purple)">${d.filter(x=>x.status==='Em Análise').length}</div><div class="stat-sub">planejadas</div></div>
-    <div class="stat-card"><div class="stat-label">Em Andamento</div><div class="stat-value" style="color:var(--orange)">${d.filter(x=>x.status==='Em Andamento').length}</div><div class="stat-sub">em execução</div></div>
-    <div class="stat-card"><div class="stat-label">Críticos</div><div class="stat-value" style="color:var(--red)">${d.filter(x=>x.situacao?.includes('Crítico')).length}</div><div class="stat-sub">sistema parado</div></div>
+    <div class="stat-card"><div class="stat-label">Abertas</div><div class="stat-value" style="color:var(--blue)">${d.filter(x=>!x.status||x.status==='Aberta').length}</div><div class="stat-sub">abertas</div></div>
+    <div class="stat-card"><div class="stat-label">Em Análise</div><div class="stat-value" style="color:var(--purple)">${d.filter(x=>x.status==='Em Análise').length}</div><div class="stat-sub">em análise</div></div>
+    <div class="stat-card"><div class="stat-label">Em Andamento</div><div class="stat-value" style="color:var(--orange)">${d.filter(x=>x.status==='Em Andamento').length}</div><div class="stat-sub">em andamento</div></div>
+    <div class="stat-card"><div class="stat-label">Críticos</div><div class="stat-value" style="color:var(--red)">${d.filter(x=>x.situacao?.includes('Crítico')).length}</div><div class="stat-sub">críticos</div></div>
     <div class="stat-card"><div class="stat-label">Concluídas</div><div class="stat-value" style="color:var(--green)">${d.filter(x=>x.status==='Concluída').length}</div><div class="stat-sub">resolvidas</div></div>
   `;
 }
@@ -238,7 +236,7 @@ function openNovaDemanda(sourceId) {
       <label class="form-label">Foto do Defeito</label>
       <div class="photo-upload">
         <input type="file" accept="image/*" id="nd-foto" onchange="previewFoto()">
-        <svg width="28" height="28" viewBox="0 0 32 32" fill="none" style="margin-bottom:6px;opacity:.4"><rect x="2" y="6" width="28" height="20" rx="3" stroke="currentColor" stroke-width="1.5"/><circle cx="16" cy="16" r="5" stroke="currentColor" stroke-width="1.5"/><path d="M11 6l2-4h6l2 4" stroke="currentColor" stroke-width="1.5" /></svg>
+        <svg width="28" height="28" viewBox="0 0 32 32" fill="none" style="margin-bottom:6px;opacity:.4"><rect x="2" y="6" width="28" height="20" rx="3" stroke="currentColor" stroke-width="1.5"/><circle cx="8" cy="12" r="1.5" fill="currentColor"/><path d="M2 20l8-8 6 6 10-10" stroke="currentColor" stroke-width="1.5" fill="none"/></svg>
         <p style="color:var(--text3);font-size:12px">Clique ou arraste uma imagem</p>
         <img id="foto-preview" class="photo-preview-img" alt="preview">
       </div>
@@ -421,7 +419,7 @@ function openAceite(id, perfil) {
       </div>
       <div class="form-group"><label class="form-label">Situação</label><div style="${ro}">${esc(d.situacao)}</div></div>
       <div class="form-group"><label class="form-label">Descrição</label><div style="${ro}min-height:60px;line-height:1.6;white-space:pre-wrap">${esc(d.descricao)}</div></div>
-      ${d.foto?`<div class="form-group"><label class="form-label">Foto</label><img src="${d.foto}" style="max-width:100%;max-height:140px;object-fit:contain;border-radius:var(--radius);background:var(--bg3)" alt="foto"></div>`:''}
+      ${d.foto?`<div class="form-group"><label class="form-label">Foto</label><img src="${d.foto}" style="max-width:100%;max-height:140px;object-fit:contain;border-radius:var(--radius);background:var(--bg3);padding:8px" alt="foto"></div>`:''}
       ${d.comentarioPlan?`<div style="background:var(--blue-bg);border:1px solid #58A6FF30;border-radius:var(--radius);padding:12px 14px;margin-bottom:14px">
         <div style="font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--blue);margin-bottom:4px;font-weight:600">💬 Comentário do Planejamento</div>
         <p style="font-size:13px;color:var(--text2)">${esc(d.comentarioPlan)}</p></div>`:''}
@@ -587,11 +585,12 @@ function openModal(id)  { document.getElementById(id).classList.add('open'); }
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 
 document.addEventListener('DOMContentLoaded', () => {
-  //document.querySelectorAll('.modal-overlay').forEach(m => {
-  //  m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
-  //});
-
-
+  // Fechar modais ao clicar no overlay
+  document.querySelectorAll('.modal-overlay').forEach(m => {
+    m.addEventListener('click', e => { 
+      if (e.target === m) closeModal(m.id); 
+    });
+  });
 
   const btn = document.getElementById('btn-toggle-filtros');
   const card = document.getElementById('filtros-card');
@@ -634,9 +633,6 @@ document.addEventListener('DOMContentLoaded', () => {
       applyState(false);
     }
   });
-
-
-
 });
 
 function toast(msg, type = 'info') {
@@ -660,7 +656,6 @@ async function init() {
   renderLoginForm('planejamento');
 }
 
-
 // ---- Filtro -----
 function toggleMultiSelect(id) {
   document.getElementById(id).classList.toggle('open');
@@ -672,6 +667,7 @@ document.addEventListener('click', (e) => {
     document.querySelectorAll('.multi-select.open').forEach(el => el.classList.remove('open'));
   }
 });
+
 function getMultiSelectValues(id) {
   const container = document.getElementById(id);
   const checkboxes = container.querySelectorAll('input[type="checkbox"]:checked');
@@ -689,15 +685,5 @@ function getMultiSelectValues(id) {
   
   return values;
 }
- // Ocultar/mostrar painel de filtros
-  const btn = document.getElementById('btn-toggle-filtros');
-  const panel = document.getElementById('filtros-card');
-
-  btn.addEventListener('click', () => {
-    const hidden = card.classList.toggle('hidden');
-    btn.setAttribute('aria-expanded', String(!hidden));
-    btn.textContent = hidden ? 'Mostrar filtros' : 'Ocultar filtros';
-  });
 
 init();
-
