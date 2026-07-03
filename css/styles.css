@@ -24,7 +24,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 .topbar-brand{display:flex;align-items:center;gap:10px;font-size:15px;font-weight:600;color:var(--text);flex-shrink:0}
 .topbar-brand svg{width:28px;height:28px;flex-shrink:0}
 .topbar-nav{display:flex;gap:4px;margin-left:auto}
-.nav-btn{background:none;border:none;color:var(--text2);padding:6px 14px;border-radius:var(--radius);cursor:pointer;font-family:var(--font);font-size:13px;font-weight:500;transition:all .15s;display:flex;align-items:center;gap:6px;white-space:nowrap}
+.nav-btn{background:none;border:none;color:var(--text2);padding:6px 14px;border-radius:var(--radius);cursor:pointer;font-family:var(--font);font-size:13px;font-weight:500;transition:all .15s;display:flex;align-items:center;gap:6px}
 .nav-btn:hover{background:var(--bg3);color:var(--text)}
 .nav-btn.active{background:var(--bg3);color:var(--blue)}
 .topbar-right{display:flex;align-items:center;gap:8px;margin-left:16px;flex-shrink:0;position:relative}
@@ -67,7 +67,7 @@ main{flex:1;padding:24px;max-width:1440px;width:100%;margin:0 auto}
 .prio-pn{background:var(--bg4);color:var(--text2)}
 
 /* BUTTONS */
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:8px 16px;border-radius:var(--radius);font-family:var(--font);font-size:13px;font-weight:500;cursor:pointer;border:none;transition:all .15s;white-space:nowrap;line-height:1}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:8px 16px;border-radius:var(--radius);font-family:var(--font);font-size:13px;font-weight:500;cursor:pointer;border:none;transition:all .15s}
 .btn-primary{background:var(--blue-light);color:#fff}.btn-primary:hover{background:#1A80FF}
 .btn-secondary{background:var(--bg3);color:var(--text);border:1px solid var(--border)}.btn-secondary:hover{border-color:var(--border2);background:var(--bg4)}
 .btn-danger{background:var(--red-bg);color:var(--red);border:1px solid #F8514930}.btn-danger:hover{background:#5A1A18;color:#FF7070}
@@ -79,11 +79,11 @@ svg.icon{width:16px;height:16px;flex-shrink:0}
 /* FORMS */
 .form-group{margin-bottom:16px}
 .form-label{display:block;font-size:12px;font-weight:500;color:var(--text2);margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em}
-.form-control{width:100%;max-width: 50px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);padding:9px 12px;font-family:var(--font);font-size:14px;transition:border-color .15s;outline:none;appearance:none;-webkit-appearance:none}
+.form-control{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);padding:9px 12px;font-family:var(--font);font-size:14px;transition:border-color .15s,box-shadow .15s}
 .form-control:focus{border-color:var(--blue-light);box-shadow:0 0 0 3px rgba(31,111,235,.15)}
 .form-control::placeholder{color:var(--text3)}
 textarea.form-control{resize:vertical;min-height:80px;appearance:auto;-webkit-appearance:auto}
-select.form-control{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236E7681' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:32px;cursor:pointer}
+select.form-control{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236E7681' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:32px}
 select.form-control option{background:var(--bg3);color:var(--text)}
 .form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 
@@ -91,8 +91,8 @@ select.form-control option{background:var(--bg3);color:var(--text)}
 .filter-bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
 .filter-bar .form-control{width:auto;min-width:130px;height:36px;padding:0 32px 0 10px;font-size:13px}
 .filter-bar select.form-control{background-position:right 8px center}
-.filter-bar input.form-control{min-width:130px;padding:0 10px}
-.search-box{position:relative;flex:1;min-width:130px;max-width:100px}
+.filter-bar input.form-control{min-width:130px;padding:0 10px;height:36px}
+.search-box{position:relative;flex:1 1 220px;min-width:180px;max-width:320px}
 .search-box input{padding-left:34px !important;height:36px}
 .search-box svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--text3);pointer-events:none;width:15px;height:15px}
 
@@ -106,7 +106,7 @@ tbody tr:hover td{background:var(--bg3);cursor:pointer}
 .td-mono{font-family:var(--mono);font-size:12px;color:var(--text2)}
 
 /* MODAL */
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;display:flex;align-items:flex-start;justify-content:center;padding:32px 16px;overflow-y:auto;opacity:0;pointer-events:none;transition:opacity .2s}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;display:flex;align-items:flex-start;justify-content:center;padding:32px 16px;overflow-y:auto;opacity:0;pointer-events:none;transition:opacity .15s}
 .modal-overlay.open{opacity:1;pointer-events:all}
 .modal{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);width:100%;max-width:700px;padding:24px;position:relative;box-shadow:0 8px 32px rgba(0,0,0,.5)}
 .modal-lg{max-width:880px}
@@ -120,7 +120,7 @@ tbody tr:hover td{background:var(--bg3);cursor:pointer}
 .status-step{flex:1;text-align:center;position:relative}
 .status-step::after{content:'';position:absolute;top:14px;left:50%;width:100%;height:2px;background:var(--border)}
 .status-step:last-child::after{display:none}
-.step-dot{width:28px;height:28px;border-radius:50%;border:2px solid var(--border);background:var(--bg);margin:0 auto 6px;display:flex;align-items:center;justify-content:center;position:relative;z-index:2;font-size:11px;font-weight:600;transition:all .2s}
+.step-dot{width:28px;height:28px;border-radius:50%;border:2px solid var(--border);background:var(--bg);margin:0 auto 6px;display:flex;align-items:center;justify-content:center;position:relative;z-index:1;font-size:12px;font-weight:600}
 .step-dot.done{border-color:var(--green);background:var(--green-bg);color:var(--green)}
 .step-dot.active{border-color:var(--blue);background:var(--blue-bg);color:var(--blue)}
 .step-label{font-size:11px;color:var(--text3);line-height:1.3}
@@ -147,7 +147,7 @@ tbody tr:hover td{background:var(--bg3);cursor:pointer}
 
 /* TOASTS */
 .toast-container{position:fixed;top:70px;right:20px;z-index:300;display:flex;flex-direction:column;gap:8px;pointer-events:none}
-.toast{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:12px 16px;max-width:320px;font-size:13px;pointer-events:all;transform:translateX(calc(100% + 24px));transition:transform .3s ease;display:flex;align-items:center;gap:10px;box-shadow:var(--shadow)}
+.toast{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:12px 16px;max-width:320px;font-size:13px;pointer-events:all;transform:translateX(calc(100% + 24px));transition:transform .3s}
 .toast.show{transform:translateX(0)}
 .toast.success{border-left:3px solid var(--green)}
 .toast.error{border-left:3px solid var(--red)}
@@ -166,6 +166,147 @@ tbody tr:hover td{background:var(--bg3);cursor:pointer}
 @keyframes spin{to{transform:rotate(360deg)}}
 .loading-overlay p{font-size:14px;color:var(--text2)}
 
+/* ============================================================
+   MULTI-SELECT DROPDOWN — Harmonia com form-control
+   ============================================================ */
+.multi-select {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.multi-select-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  min-width: 120px;
+  height: 36px;
+  padding: 0 32px 0 10px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color .15s, box-shadow .15s;
+  box-sizing: border-box;
+}
+
+.multi-select-trigger:hover {
+  border-color: var(--border2);
+}
+
+.multi-select-trigger:focus {
+  outline: none;
+  border-color: var(--blue-light);
+  box-shadow: 0 0 0 3px rgba(31,111,235,.15);
+}
+
+/* Foco no container wrapper */
+.multi-select:focus-within .multi-select-trigger {
+  border-color: var(--blue-light);
+  box-shadow: 0 0 0 3px rgba(31,111,235,.15);
+}
+
+.multi-select-label {
+  font-size: 13px;
+  color: var(--text);
+}
+
+.multi-select-trigger svg.icon {
+  width: 14px;
+  height: 14px;
+  opacity: 0.6;
+  flex-shrink: 0;
+}
+
+.multi-select-dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  z-index: 120;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 8px;
+  display: none;
+  min-width: 100%;
+  box-sizing: border-box;
+}
+
+.multi-select.open .multi-select-dropdown {
+  display: block;
+}
+
+.multi-select-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  font-size: 13px;
+  cursor: pointer;
+  color: var(--text);
+  transition: background-color .15s;
+  white-space: nowrap;
+}
+
+.multi-select-option:hover {
+  background: var(--bg4);
+}
+
+.multi-select-option input[type="checkbox"] {
+  accent-color: var(--blue-light);
+  cursor: pointer;
+}
+
+/* Alinhamento em filter-bar */
+.filter-bar .multi-select {
+  width: auto;
+  min-width: 130px;
+}
+
+.filter-bar .multi-select-trigger {
+  height: 36px;
+  padding: 0 32px 0 10px;
+  font-size: 13px;
+}
+
+/* Collapsar animação para filtros */
+.collapsible {
+  overflow: hidden;
+  max-height: 1000px;
+  transition: max-height .28s ease, opacity .2s ease;
+  opacity: 1;
+}
+
+.collapsible.collapsed {
+  max-height: 0;
+  opacity: 0;
+}
+
+.card.collapsible {
+  overflow: hidden;
+  transition: max-height .28s ease, opacity .2s ease, margin .2s ease, padding .2s ease;
+  max-height: 1200px;
+  opacity: 1;
+}
+
+.card.collapsible.collapsed {
+  max-height: 0;
+  opacity: 0;
+  margin-bottom: 0 !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  pointer-events: none;
+}
+
 /* RESPONSIVE */
 @media(max-width:768px){
   .form-row,.detail-grid{grid-template-columns:1fr}
@@ -173,1882 +314,20 @@ tbody tr:hover td{background:var(--bg3);cursor:pointer}
   main{padding:16px}
   .topbar-nav .nav-btn span{display:none}
   .topbar{padding:0 16px}
-  .search-box{max-width:100%}
+  .search-box{max-width:100%;flex:1}
+  .filter-bar{gap:12px}
+  .filter-bar .form-control,
+  .filter-bar .multi-select{min-width:100%;width:100%;flex:1 1 100%}
   table{min-width:700px}
+  .modal{max-width:90vw;padding:16px}
 }
+
 @media(max-width:480px){
   .stats-grid{grid-template-columns:1fr 1fr}
   .page-header{flex-direction:column;align-items:flex-start}
-}
-/* ACRESENTADO: Multi-select dropdown */
-
-.multi-select {
-  position: relative;
-  min-width: 120px;
-
-  
-  font-family: var(--font);
-  font-size: 13px;
-  transition: border-color .15s, box-shadow .15s, opacity .15s;
-  cursor: pointer;
-  box-sizing: border-box;
-}
-
-.multi-select-trigger {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  width: 100%;
-  padding: 9px 8px;
-  background: var(--bg3);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  color: var(--text);
-  padding: 9px 12px;
-  font-family: var(--font);
-  font-size: 13px;
-  transition: border-color .15s, box-shadow .15s, opacity .15s;
-  cursor: pointer;
-  box-sizing: border-box;
-  opacity: 0.85;
-  white-space: nowrap;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236E7681' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:32px;cursor:pointer;
-  min-height: 36px;
-  white-space: nowrap;
-  opacity: 1;
-} 
-
-/* Efeito de foco igual ao .form-control:focus */
-.multi-select:focus-within,
-.multi-select-trigger:focus {
-  border-color: var(--blue-light);
-  border-radius: var(--radius);
-  box-shadow: var(--blue-light);
-  outline: none;
-}
-/* Ícone e texto internos com mesma aparência */
-.multi-select-trigger .icon { display: none; width: 16px; height: 16px; opacity: .9; }
-.multi-select-trigger .label { font-size: 14px; color: var(--text); }
-
-.multi-select-dropdown {
-  position: absolute;
-  top: calc(100% + 4px);
-  left: 0;
-  z-index: 100;
-  min-width: 100%;
-  background: var(--bg3);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  padding: 9px;
-  opacity: 0.85;
-  display: none;
-}
-
-.multi-select.open .multi-select-dropdown {
-  display: block;
-}
-
-/* Opções com padding e hover similar ao input */
-.multi-select-option {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 9px 8px;
-  border-radius: 8px;
-  font-size: 14px;
-  cursor: pointer;
-  color: var(--text);
-  white-space: nowrap;
-  opacity: 0.85;
-}
-.multi-select-option:hover {
-  background: var(--blue-light);
-}
-.multi-select-option input[type="checkbox"] {
-  accent-color: var(--blue-light);
-}
-/* Trasição suave do painel de filtros */
-  .collapsible {
-    overflow: hidden;
-    max-height: 1000px; /* valor grande suficiente para o conteúdo */
-    transition: max-height .28s ease, opacity .2s ease;
-    opacity: 1;
-  }
-  .collapsible.collapsed {
-    max-height: 0;
-    opacity: 0;
-  }
-
-  /* animação suave (mantê-la no seu styles.css) */
-.card.collapsible {
-  overflow: hidden;
-  transition: max-height .28s ease, opacity .2s ease, margin .2s ease, padding .2s ease;
-  max-height: 1200px;
-  opacity: 1;
-}
-.card.collapsible.collapsed {
-  max-height: 0;
-  opacity: 0;
-  margin-bottom: 0 !important;
-  padding-top: 0 !important;
-  padding-bottom: 0 !important;
-  pointer-events: none;
-}
-
-/* compatibilidade simples */
-.card.hidden { display: none !important; }
-
-Imagem de perfil
-
-Convidar
-Hoje
-Você disse
-
-.form-group{margin-bottom:16px}
-.form-label{display:block;font-size:12px;font-weight:500;color:var(--text2);margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em}
-.form-control{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);padding:9px 12px;font-family:var(--font);font-size:14px;transition:border-color .15s;outline:none;appearance:none;-webkit-appearance:none}
-.form-control:focus{border-color:var(--blue-light);box-shadow:0 0 0 3px rgba(31,111,235,.15)}
-.form-control::placeholder{color:var(--text3)}
-textarea.form-control{resize:vertical;min-height:80px;appearance:auto;-webkit-appearance:auto}
-select.form-control{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236E7681' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:32px;cursor:pointer}
-select.form-control option{background:var(--bg3);color:var(--text)}
-.form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px} onde ajustar a largura deste componente?
-O Copilot disse
-Você pode ajustar a largura do componente diretamente na regra .form-control, já que é nela que está definido width: 100%. Esse valor faz com que o campo ocupe toda a largura disponível do contêiner pai.
-
-Opções para ajustar a largura
-Definir largura fixa  
-Exemplo:
-
-css
-
-
-Copiar
-.form-control {
-  width: 300px;
-}
-O campo terá sempre 300px de largura.
-
-Usar porcentagem  
-Exemplo:
-
-css
-
-
-Copiar
-.form-control {
-  width: 50%;
-}
-O campo ocupará metade da largura do contêiner.
-
-Usar max-width  
-Exemplo:
-
-css
-
-
-Copiar
-.form-control {
-  width: 100%;
-  max-width: 400px;
-}
-O campo se adapta ao contêiner, mas nunca ultrapassa 400px.
-
-Ajustar no grid  
-Como você usa .form-row com grid-template-columns: 1fr 1fr, cada campo ocupa metade da largura. Alterar para grid-template-columns: 1fr ou grid-template-columns: 2fr 1fr muda a proporção.
-
-👉 Se você quiser que apenas alguns campos tenham largura diferente, pode criar uma classe extra, por exemplo .form-control.small ou .form-control.large, e aplicar regras específicas.
-
-Quer que eu te mostre um exemplo prático de como deixar um campo de texto ocupando toda a linha e outro apenas metade?
-
-
-
-
-
-
-
-Editar em uma página
-Você disse
-styles.css
-
-Arquivo
-
-
-como ajustar o multi-select para ficar com a mesma aparencia e efeitos do from-control
-O Copilot disse
-Ajuste do multi-select
-Resumo rápido  
-Para que o seu componente .multi-select tenha a mesma aparência e os mesmos efeitos do .form-control, aplique as mesmas propriedades visuais (largura, fundo, borda, radius, padding, fonte, transição) e replique o efeito de foco usando :focus-within no wrapper. Abaixo segue CSS pronto para colar e adaptar.
-
-Trecho do seu arquivo:
-.form-control{width:100%;max-width: 50px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);padding:9px 12px;font-family:var(--font);font-size:14px;transition:border-color .15s;outline:none;appearance:none;-webkit-appearance:none}.
-Trecho do seu arquivo:
-.form-control:focus{border-color:var(--blue-light);box-shadow:0 0 0 3px rgba(31,111,235,.15)}.
-
-CSS sugerido (faça override do seu .multi-select atual)
-css
-
-
-Copiar
-/* Base: igualar visual ao .form-control */
-.multi-select,
-.multi-select-trigger {
-  width: 100%;
-  background: var(--bg3);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  color: var(--text);
-  padding: 9px 12px;
-  font-family: var(--font);
-  font-size: 14px;
-  transition: border-color .15s, box-shadow .15s, opacity .15s;
-  cursor: pointer;
-  box-sizing: border-box;
-}
-
-/* Forçar mesma altura e comportamento de placeholder */
-.multi-select-trigger {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  min-height: 36px;
-  white-space: nowrap;
-  opacity: 1;
-}
-
-/* Efeito de foco igual ao .form-control:focus */
-.multi-select:focus-within,
-.multi-select-trigger:focus {
-  border-color: var(--blue-light);
-  box-shadow: 0 0 0 3px rgba(31,111,235,.15);
-  outline: none;
-}
-
-/* Ícone e texto internos com mesma aparência */
-.multi-select-trigger .icon { width: 16px; height: 16px; opacity: .9; }
-.multi-select-trigger .label { font-size: 14px; color: var(--text); }
-
-/* Dropdown e opções: manter consistência visual */
-.multi-select-dropdown {
-  min-width: 100%;
-  background: var(--bg3);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  padding: 8px;
-}
-
-/* Opções com padding e hover similar ao input */
-.multi-select-option {
-  padding: 9px 12px;
-  border-radius: 6px;
-  font-size: 14px;
-  color: var(--text);
-}
-.multi-select-option:hover {
-  background: var(--bg4);
-}
-
-/* Checkbox/accent para combinar com tema */
-.multi-select-option input[type="checkbox"] {
-  accent-color: var(--blue-light);
-  width: 16px;
-  height: 16px;
-}
-
-/* Se quiser limitar largura como .form-control em outros contextos */
-.multi-select.inline-small { max-width: 50px; }
-Explicação das mudanças
-Propriedades copiadas: background, border, border-radius, padding, font-family, font-size e transition vêm diretamente do .form-control para garantir aparência idêntica.
-
-Foco: como o .form-control usa :focus com box-shadow, usamos :focus-within no wrapper .multi-select para que o efeito apareça quando o trigger ou elementos internos recebem foco.
-
-Altura e espaçamento: min-height e padding alinham a altura visual com outros inputs.
-
-Dropdown: borda, fundo e box-shadow do dropdown seguem o mesmo padrão para manter consistência quando aberto.
-
-Acessibilidade: cursor: pointer e focus-within ajudam navegação por teclado; mantenha também aria-* no HTML.
-
-Como aplicar no seu projeto
-Cole o CSS acima após as regras atuais do .multi-select no styles.css para garantir override.
-
-Se usar variantes (por exemplo, dentro de .filter-bar), ajuste min-width ou adicione classes utilitárias (.inline-small, .filter) conforme necessário.
-
-Teste foco via teclado (Tab) e clique para confirmar o box-shadow e a borda mudam como nos inputs.
-
-Se quiser, eu adapto esse CSS ao HTML que você está usando (posso gerar um exemplo de marcação com classes e atributos aria), ou reduzo o max-width para um valor específico que você prefira.
-
-
-
-
-
-
-
-Editar em uma página
-Você disse
-
-como ajustar o mesmo espacamento entre o multi-select e os desmais componentes
-O Copilot disse
-Espaçamento entre o multi-select e os demais componentes
-Para garantir o mesmo espaçamento que os outros campos, alinhe o wrapper do multi-select às mesmas regras de espaçamento usadas nos inputs (por exemplo .form-group, gap do container ou utilitários de margem). Abaixo há opções práticas — escolha a que melhor se encaixa na sua estrutura HTML.
-
-1. Usar a mesma estrutura de formulário (.form-group)
-Se cada campo está dentro de .form-group (que já tem margin-bottom:16px), envolva o multi-select com a mesma classe:
-
-html
-
-
-Copiar
-<div class="form-group">
-  <label class="form-label">Categorias</label>
-  <div class="multi-select"> ... </div>
-</div>
-Nenhuma alteração CSS adicional é necessária porque .form-group aplica o espaçamento vertical padrão.
-
-2. Ajustar margem do próprio .multi-select
-Se não puder envolver com .form-group, aplique a mesma margem diretamente:
-
-css
-
-
-Copiar
-.multi-select {
-  margin-bottom: 16px; /* mesmo valor de .form-group */
-}
-Use margin-top também quando precisar espaçar acima.
-
-3. Usar gap no container (recomendado para layouts em grid/flex)
-Se os campos estão em um container com display:flex ou display:grid, controle o espaçamento centralmente:
-
-css
-
-
-Copiar
-.form-row { /* já existe no seu CSS */
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px; /* espaçamento horizontal e vertical entre itens */
-}
-
-/* ou para flex */
-.form-column {
-  display: flex;
-  flex-direction: column;
-  gap: 16px; /* espaçamento vertical consistente entre filhos */
-}
-Coloque o .multi-select como filho desse container para herdar o espaçamento.
-
-4. Criar utilitárias para consistência
-Se quiser consistência em todo o projeto, crie classes utilitárias:
-
-css
-
-
-Copiar
-.mb-16 { margin-bottom: 16px; }
-.mt-16 { margin-top: 16px; }
-.gap-16 { gap: 16px; }
-Aplicação:
-
-html
-
-
-Copiar
-<div class="multi-select mb-16">...</div>
-5. Ajustes finos para alinhamento horizontal com inputs
-Se o multi-select tiver width:100% e padding diferente, alinhe visualmente com inputs:
-
-css
-
-
-Copiar
-.multi-select,
-.form-control {
-  padding-left: 12px;
-  padding-right: 12px;
-  box-sizing: border-box;
-}
-Se o trigger do multi-select usa padding diferente, normalize para a mesma altura:
-
-css
-
-
-Copiar
-.multi-select-trigger {
-  min-height: 36px; /* mesma altura dos inputs em .filter-bar */
-  padding: 9px 12px;
-}
-Verificação rápida (checklist)
-Vertical: está dentro de .form-group ou tem margin-bottom:16px?
-
-Container: o pai usa gap consistente (16px)?
-
-Altura/Padronização: padding e min-height do trigger igual aos inputs.
-
-Responsivo: confirme em telas pequenas (media queries) se o espaçamento se mantém.
-
-Se quiser, eu adapto o CSS exato ao trecho do seu HTML (cole aqui o markup do multi-select e onde ele está no formulário) e eu retorno o CSS pronto para colar.
-
-
-
-
-
-
-
-Editar em uma página
-Você disse
-
-<div class="card" style="margin-bottom:16px">
-    <div class="filter-bar">
-        <div class="search-box">
-        <svg viewBox="0 0 16 16" fill="currentColor"><path d="M6 1a5 5 0 100 10A5 5 0 006 1zm4.32 4.32l4.36 4.36-1.41 1.41-4.36-4.36A5 5 0 0010.32 5.32z"/></svg>
-        <input type="text" class="form-control" placeholder="Buscar ID, TAG, local, OM..." oninput="aplicarFiltros()" id="f-busca">
-      </div>
-      <input type="date" class="form-control" id="f-data-ini" onchange="aplicarFiltros()" title="Data inicial">
-      <input type="date" class="form-control" id="f-data-fim" onchange="aplicarFiltros()" title="Data final">
-      <select class="form-control" id="f-site" onchange="aplicarFiltros()"><option value="">Todos os sites</option></select>
-      <select class="form-control" id="f-local" onchange="aplicarFiltros()"><option value="">Todos os locais</option></select>
-      <select class="form-control" id="f-situacao" onchange="aplicarFiltros()">
-        <option value="">Situações</option>
-        <option value="Sistema parado - Crítico">Crítico</option>
-        <option value="Sistema parcialmente parado - Prioritário">Prioritário</option>
-        <option value="Sistema com Restrição - Moderado">Moderado</option>
-        <option value="Sistema operando - Leve">Leve</option>
-      </select>
-      <select class="form-control" id="f-prioridade" onchange="aplicarFiltros()">
-        <option value="">Prioridade</option>
-        <option>P0</option><option>P1</option><option>P2</option><option>P3</option><option>P4</option><option>P5</option>
-      </select>
-        <!-- substituindo este
-          <select class="form-control" id="f-status" onchange="aplicarFiltros()">
-            <option value="">Todos status</option>
-            <option>Aberta</option><option>Em Análise</option><option>Em Andamento</option><option>Concluída</option><option>Cancelada</option>
-          </select>
-        -->
-      <!-- por este-->
-      <div class="multi-select" id="f-status">
-         <button class="multi-select-trigger" onclick="toggleMultiSelect('f-status')" type="button">
-            <span class="multi-select-label">Status</span>
-            <svg class="icon" viewBox="0 0 16 16" fill="currentColor"><path d="M4 6l4 4 4-4"/></svg>
-          </button>
-      <div class="multi-select-dropdown">
-    <label class="multi-select-option"><input type="checkbox" value="Aberta" onchange="aplicarFiltros()"> Aberta</label>
-    <label class="multi-select-option"><input type="checkbox" value="Em Análise" onchange="aplicarFiltros()"> Em Análise</label>
-    <label class="multi-select-option"><input type="checkbox" value="Em Andamento" onchange="aplicarFiltros()"> Em Andamento</label>
-    <label class="multi-select-option"><input type="checkbox" value="Concluída" onchange="aplicarFiltros()"> Concluída</label>
-  </div> ajustar o espacamento entre os componentes para fircar com a mesma largura
-O Copilot disse
-Ajuste para igualar largura e espaçamento do multi-select
-Resumo: dentro de .filter-bar os inputs usam regras específicas (width:auto, min-width, height, padding). Faça o .multi-select herdar os mesmos valores e remova margens extras. Cole o CSS abaixo após suas regras atuais para sobrescrever corretamente.
-
-css
-
-
-Copiar
-/* 1) Tornar o multi-select consistente com os .form-control dentro de .filter-bar */
-.filter-bar .multi-select {
-  width: auto;               /* mesmo comportamento dos selects/inputs no filtro */
-  min-width: 120px;         /* mesmo min-width usado por .filter-bar .form-control */
-  height: 36px;             /* mesma altura visual */
-  margin: 0;                /* garantir que não haja margem extra */
-  display: inline-flex;
-  align-items: center;
-  box-sizing: border-box;
-}
-
-/* 2) Ajustar o trigger para ter padding, fonte e altura iguais */
-.filter-bar .multi-select-trigger {
-  width: 100%;
-  padding: 0 32px 0 10px;   /* mesmo padding dos selects/inputs no filtro */
-  height: 36px;
-  font-size: 13px;
-  background: var(--bg3);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  color: var(--text);
-  transition: border-color .15s, box-shadow .15s;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  cursor: pointer;
-}
-
-/* 3) Foco: replicar o efeito do .form-control:focus */
-.filter-bar .multi-select:focus-within,
-.filter-bar .multi-select-trigger:focus {
-  border-color: var(--blue-light);
-  box-shadow: 0 0 0 3px rgba(31,111,235,.15);
-  outline: none;
-}
-
-/* 4) Dropdown: alinhar visualmente com os selects */
-.filter-bar .multi-select-dropdown {
-  min-width: 100%;
-  margin-top: 4px;
-  padding: 8px;
-  background: var(--bg3);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-}
-
-/* 5) Garantir que o container .filter-bar mantenha espaçamento consistente */
-.filter-bar { gap: 8px; align-items: center; }
-
-/* Opcional: forçar mesma largura que um select específico (se quiser todos iguais) */
-/* .filter-bar .multi-select { min-width: 150px; } */
-Por que isso funciona
-Mesmas propriedades: min-width, height, padding, font-size e border são os pontos que definem a largura visual e o alinhamento entre controles.
-
-width:auto + min-width permite que o componente se ajuste ao layout flexível da .filter-bar (igual aos <select> e <input>).
-
-:focus-within no wrapper reproduz o mesmo efeito de foco do .form-control.
-
-Remover margens evita deslocamentos inesperados entre elementos.
-
-Checklist rápido para testar
-[ ] Cole o CSS acima após suas regras atuais no styles.css.
-
-[ ] Verifique no desktop: todos os controles na .filter-bar alinhados e com mesma altura.
-
-[ ] Teste foco via teclado (Tab) — o box-shadow deve aparecer no multi-select.
-
-[ ] Teste em mobile (media queries) para confirmar responsividade.
-
-Se quiser que o multi-select tenha exatamente a mesma largura fixa de um select específico, diga qual largura prefere (ex.: 150px) que eu ajusto o snippet final.
-
-
-
-
-
-
-
-Editar em uma página
-Você disse
-
-<div class="card" style="margin-bottom:16px">
-    <div class="filter-bar">
-        <div class="search-box">
-        <svg viewBox="0 0 16 16" fill="currentColor"><path d="M6 1a5 5 0 100 10A5 5 0 006 1zm4.32 4.32l4.36 4.36-1.41 1.41-4.36-4.36A5 5 0 0010.32 5.32z"/></svg>
-        <input type="text" class="form-control" placeholder="Buscar ID, TAG, local, OM..." oninput="aplicarFiltros()" id="f-busca">
-      </div>
-      <input type="date" class="form-control" id="f-data-ini" onchange="aplicarFiltros()" title="Data inicial">
-      <input type="date" class="form-control" id="f-data-fim" onchange="aplicarFiltros()" title="Data final">
-      <select class="form-control" id="f-site" onchange="aplicarFiltros()"><option value="">Todos os sites</option></select>
-      <select class="form-control" id="f-local" onchange="aplicarFiltros()"><option value="">Todos os locais</option></select>
-      <select class="form-control" id="f-situacao" onchange="aplicarFiltros()">
-        <option value="">Situações</option>
-        <option value="Sistema parado - Crítico">Crítico</option>
-        <option value="Sistema parcialmente parado - Prioritário">Prioritário</option>
-        <option value="Sistema com Restrição - Moderado">Moderado</option>
-        <option value="Sistema operando - Leve">Leve</option>
-      </select>
-      <select class="form-control" id="f-prioridade" onchange="aplicarFiltros()">
-        <option value="">Prioridade</option>
-        <option>P0</option><option>P1</option><option>P2</option><option>P3</option><option>P4</option><option>P5</option>
-      </select>
-        <!-- substituindo este
-          <select class="form-control" id="f-status" onchange="aplicarFiltros()">
-            <option value="">Todos status</option>
-            <option>Aberta</option><option>Em Análise</option><option>Em Andamento</option><option>Concluída</option><option>Cancelada</option>
-          </select>
-        -->
-      <!-- por este-->
-      <div class="multi-select" id="f-status">
-         <button class="multi-select-trigger" onclick="toggleMultiSelect('f-status')" type="button">
-            <span class="multi-select-label">Status</span>
-            <svg class="icon" viewBox="0 0 16 16" fill="currentColor"><path d="M4 6l4 4 4-4"/></svg>
-          </button>
-      <div class="multi-select-dropdown">
-    <label class="multi-select-option"><input type="checkbox" value="Aberta" onchange="aplicarFiltros()"> Aberta</label>
-    <label class="multi-select-option"><input type="checkbox" value="Em Análise" onchange="aplicarFiltros()"> Em Análise</label>
-    <label class="multi-select-option"><input type="checkbox" value="Em Andamento" onchange="aplicarFiltros()"> Em Andamento</label>
-    <label class="multi-select-option"><input type="checkbox" value="Concluída" onchange="aplicarFiltros()"> Concluída</label>
-  </div>
-</div>
-
-<div class="container">
-  <div id="select" ng-model=""></div>
-</div>
-      
-      <!--até aqui -->
-      <select class="form-control" id="f-equipe" onchange="aplicarFiltros()">
-        <option value="">Todas as equipes</option>
-        <option>Manutenção Corretiva</option><option>Manutenção Preventiva</option><option>Inspeção</option><option>PCM</option>
-      </select>
-      <select class="form-control" id="f-solicitante" onchange="aplicarFiltros()"><option value="">Todos solicitantes</option></select>
-      <button class="btn btn-secondary btn-sm" onclick="limparFiltros()">Limpar</button>
-    </div>
-  </div> organize este código deixando com espacamento entre item iguais
-O Copilot disse
-Código organizado e espaçamento consistente
-Abaixo está o HTML limpo e indentado e o CSS complementar para garantir que todos os controles da .filter-bar (incluindo o multi-select) tenham mesma altura, padding e espaçamento. Cole o CSS após suas regras existentes para sobrescrever quando necessário.
-
-HTML
-
-html
-
-
-Copiar
-<div class="card" style="margin-bottom:16px">
-  <div class="filter-bar">
-    <div class="search-box">
-      <svg viewBox="0 0 16 16" fill="currentColor"><path d="M6 1a5 5 0 100 10A5 5 0 006 1zm4.32 4.32l4.36 4.36-1.41 1.41-4.36-4.36A5 5 0 0010.32 5.32z"/></svg>
-      <input type="text" class="form-control" placeholder="Buscar ID, TAG, local, OM..." oninput="aplicarFiltros()" id="f-busca">
-    </div>
-
-    <input type="date" class="form-control" id="f-data-ini" onchange="aplicarFiltros()" title="Data inicial">
-    <input type="date" class="form-control" id="f-data-fim" onchange="aplicarFiltros()" title="Data final">
-
-    <select class="form-control" id="f-site" onchange="aplicarFiltros()">
-      <option value="">Todos os sites</option>
-    </select>
-
-    <select class="form-control" id="f-local" onchange="aplicarFiltros()">
-      <option value="">Todos os locais</option>
-    </select>
-
-    <select class="form-control" id="f-situacao" onchange="aplicarFiltros()">
-      <option value="">Situações</option>
-      <option value="Sistema parado - Crítico">Crítico</option>
-      <option value="Sistema parcialmente parado - Prioritário">Prioritário</option>
-      <option value="Sistema com Restrição - Moderado">Moderado</option>
-      <option value="Sistema operando - Leve">Leve</option>
-    </select>
-
-    <select class="form-control" id="f-prioridade" onchange="aplicarFiltros()">
-      <option value="">Prioridade</option>
-      <option>P0</option><option>P1</option><option>P2</option><option>P3</option><option>P4</option><option>P5</option>
-    </select>
-
-    <!-- multi-select substituindo select de status -->
-    <div class="multi-select" id="f-status" tabindex="0">
-      <button class="multi-select-trigger" type="button" onclick="toggleMultiSelect('f-status')">
-        <span class="multi-select-label">Status</span>
-        <svg class="icon" viewBox="0 0 16 16" fill="currentColor"><path d="M4 6l4 4 4-4"/></svg>
-      </button>
-
-      <div class="multi-select-dropdown" aria-hidden="true">
-        <label class="multi-select-option"><input type="checkbox" value="Aberta" onchange="aplicarFiltros()"> Aberta</label>
-        <label class="multi-select-option"><input type="checkbox" value="Em Análise" onchange="aplicarFiltros()"> Em Análise</label>
-        <label class="multi-select-option"><input type="checkbox" value="Em Andamento" onchange="aplicarFiltros()"> Em Andamento</label>
-        <label class="multi-select-option"><input type="checkbox" value="Concluída" onchange="aplicarFiltros()"> Concluída</label>
-      </div>
-    </div>
-
-    <!-- container extra mantido, posicione conforme necessidade -->
-    <div class="container">
-      <div id="select" ng-model=""></div>
-    </div>
-
-    <select class="form-control" id="f-equipe" onchange="aplicarFiltros()">
-      <option value="">Todas as equipes</option>
-      <option>Manutenção Corretiva</option><option>Manutenção Preventiva</option><option>Inspeção</option><option>PCM</option>
-    </select>
-
-    <select class="form-control" id="f-solicitante" onchange="aplicarFiltros()">
-      <option value="">Todos solicitantes</option>
-    </select>
-
-    <button class="btn btn-secondary btn-sm" onclick="limparFiltros()">Limpar</button>
-  </div>
-</div>
-CSS complementar
-
-css
-
-
-Copiar
-/* Garantir espaçamento uniforme entre itens da filter-bar */
-.filter-bar {
-  display: flex;
-  gap: 8px;               /* espaçamento horizontal entre controles */
-  flex-wrap: wrap;
-  align-items: center;
-}
-
-/* Normalizar altura, padding e min-width para todos os controles */
-.filter-bar .form-control,
-.filter-bar .multi-select {
-  width: auto;
-  min-width: 120px;       /* mesmo valor usado no seu CSS */
-  height: 36px;           /* mesma altura visual */
-  box-sizing: border-box;
-  margin: 0;
-}
-
-/* Ajuste do search-box para manter largura flexível */
-.filter-bar .search-box {
-  flex: 1 1 220px;        /* ocupa espaço disponível, respeita min-width */
-  min-width: 180px;
-  max-width: 320px;
-}
-
-/* Trigger do multi-select com aparência igual aos form-control */
-.filter-bar .multi-select {
-  display: inline-flex;
-  align-items: center;
-  position: relative;
-}
-
-.filter-bar .multi-select-trigger {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  width: 100%;
-  padding: 0 32px 0 10px; /* mesmo padding dos inputs em .filter-bar */
-  height: 36px;
-  font-size: 13px;
-  background: var(--bg3);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  color: var(--text);
-  transition: border-color .15s, box-shadow .15s;
-  cursor: pointer;
-}
-
-/* Foco igual ao .form-control */
-.filter-bar .multi-select:focus-within .multi-select-trigger,
-.filter-bar .multi-select-trigger:focus {
-  border-color: var(--blue-light);
-  box-shadow: 0 0 0 3px rgba(31,111,235,.15);
-  outline: none;
-}
-
-/* Dropdown alinhado e com largura do trigger */
-.filter-bar .multi-select-dropdown {
-  position: absolute;
-  top: calc(100% + 6px);
-  left: 0;
-  min-width: 100%;
-  background: var(--bg3);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  padding: 8px;
-  z-index: 120;
-  display: none;
-}
-
-/* Mostrar dropdown quando a classe .open for aplicada via JS */
-.filter-bar .multi-select.open .multi-select-dropdown {
-  display: block;
-}
-
-/* Opções com padding e hover consistente */
-.filter-bar .multi-select-option {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 8px 10px;
-  border-radius: 6px;
-  font-size: 14px;
-  color: var(--text);
-}
-.filter-bar .multi-select-option:hover {
-  background: var(--bg4);
-}
-
-/* Forçar consistência visual entre selects e multi-select em telas pequenas */
-@media (max-width: 768px) {
-  .filter-bar { gap: 12px; }
+  .filter-bar{flex-direction:column}
   .filter-bar .form-control,
-  .filter-bar .multi-select { min-width: 100%; flex: 1 1 100%; }
-  .filter-bar .search-box { max-width: 100%; }
+  .filter-bar .multi-select,
+  .filter-bar .search-box{width:100%}
+  .form-row{grid-template-columns:1fr}
 }
-Observações rápidas
-Onde colar: adicione o CSS após suas regras existentes para garantir override.
-
-Comportamento do dropdown: o CSS assume que você adiciona/removerá a classe .open no wrapper .multi-select via toggleMultiSelect para abrir/fechar.
-
-Ajustes finos: altere min-width para 140px ou 150px se quiser controles mais largos por padrão.
-
-Se quiser, eu já adapto o toggleMultiSelect em JavaScript para gerenciar aria-expanded, foco e fechamento ao clicar fora. Quer que eu gere esse script pronto?
-
-
-
-
-
-
-
-Editar em uma página
-Você disse
-
-como ocultar a imagem do multi-select
-O Copilot disse
-Ocultar a imagem (ícone) do multi-select
-Aqui estão formas simples e seguras de ocultar o ícone do seu .multi-select (o SVG dentro de .multi-select-trigger) e manter o espaçamento/alinhamento com os demais controles.
-
-1) CSS — ocultar o ícone globalmente
-css
-
-
-Copiar
-/* remove o ícone em todos os multi-selects */
-.multi-select-trigger .icon {
-  display: none;
-}
-2) CSS — ocultar apenas no multi-select específico
-css
-
-
-Copiar
-/* remove o ícone só no multi-select de id f-status */
-#f-status .icon {
-  display: none;
-}
-3) Manter padding/espacamento após ocultar o ícone
-Se o trigger tinha padding-right para o ícone, ajuste para não deixar espaço vazio:
-
-css
-
-
-Copiar
-/* reduz o padding-right quando o ícone estiver oculto */
-#f-status .multi-select-trigger {
-  padding-right: 12px; /* ajuste conforme necessário */
-}
-4) Alternativa: esconder visualmente mas manter no DOM (acessibilidade)
-Se preferir manter o SVG no DOM (por exemplo para leitores de tela) mas escondê-lo visualmente:
-
-css
-
-
-Copiar
-#f-status .icon {
-  width: 0;
-  height: 0;
-  overflow: hidden;
-  opacity: 0;
-  pointer-events: none;
-}
-5) Remover via JavaScript (quando quiser condicionalmente)
-js
-
-
-Copiar
-// remove o elemento SVG do trigger
-const icon = document.querySelector('#f-status .multi-select-trigger .icon');
-if (icon) icon.remove();
-Recomendações rápidas
-Use o seletor específico (#f-status .icon) para evitar afetar outros componentes.
-
-Ajuste o padding-right do .multi-select-trigger para manter alinhamento com os <select> e inputs.
-
-Prefira display:none se não precisar do ícone para acessibilidade; use a técnica de esconder visualmente se quiser manter o elemento para leitores de tela.
-
-Quer que eu gere o trecho CSS final já integrado ao seu .filter-bar com os valores exatos de padding-right que você está usando (por exemplo 32px → 12px), ou prefere que eu aplique a remoção via JS no toggleMultiSelect?
-
-
-
-
-
-
-
-Editar em uma página
-Você disse
-
-como colocar um botao para ocultar o conteudo de um div ao click e fazer o inverso apos outro click
-O Copilot disse
-Toggle show/hidden do conteúdo com um botão
-Abaixo há duas opções: uma simples (usa display:none) e outra com animação suave (usa max-height), ambas acessíveis (botão com aria-expanded e aria-controls). Cole o HTML, CSS e JS no seu projeto.
-
-1 — Simples (sem animação)
-html
-
-
-Copiar
-<!-- HTML -->
-<button id="toggleBtn" aria-expanded="true" aria-controls="panel">Ocultar</button>
-<div id="panel">
-  <!-- conteúdo a ser ocultado -->
-  <p>Conteúdo visível que será ocultado/mostrado.</p>
-</div>
-
-<!-- JS -->
-<script>
-  const btn = document.getElementById('toggleBtn');
-  const panel = document.getElementById('panel');
-
-  btn.addEventListener('click', () => {
-    const isHidden = panel.style.display === 'none';
-    panel.style.display = isHidden ? '' : 'none';
-    btn.setAttribute('aria-expanded', String(isHidden));
-    btn.textContent = isHidden ? 'Ocultar' : 'Mostrar';
-  });
-</script>
-2 — Com animação suave (recomendado)
-html
-
-
-Copiar
-<!-- HTML -->
-<button id="toggleBtn" aria-expanded="true" aria-controls="panel" class="btn btn-secondary btn-sm">
-  Ocultar
-</button>
-
-<div id="panel" class="collapsible">
-  <p>Conteúdo que será ocultado/mostrado com transição suave.</p>
-</div>
-
-<!-- CSS -->
-<style>
-  .collapsible {
-    overflow: hidden;
-    max-height: 1000px; /* valor grande suficiente para o conteúdo */
-    transition: max-height .28s ease, opacity .2s ease;
-    opacity: 1;
-  }
-  .collapsible.collapsed {
-    max-height: 0;
-    opacity: 0;
-  }
-</style>
-
-<!-- JS -->
-<script>
-  const btn = document.getElementById('toggleBtn');
-  const panel = document.getElementById('panel');
-
-  btn.addEventListener('click', () => {
-    const isCollapsed = panel.classList.toggle('collapsed');
-    btn.setAttribute('aria-expanded', String(!isCollapsed));
-    btn.textContent = isCollapsed ? 'Mostrar' : 'Ocultar';
-  });
-</script>
-Dicas rápidas
-Acessibilidade: use button (não div) e mantenha aria-expanded atualizado; aria-controls aponta para o id do painel.
-
-Altura dinâmica: se o conteúdo pode ser muito alto, em vez de max-height:1000px calcule dinamicamente a altura para animação perfeita (posso fornecer esse script se quiser).
-
-Integração: para aplicar ao seu .multi-select ou outro elemento, substitua #panel pelo id do elemento alvo e ajuste o texto do botão conforme necessário.
-
-
-
-
-
-
-
-Editar em uma página
-Você disse
-
-<div class="card" style="margin-bottom:16px" id="filtros-card">
-    <div class="filter-bar">
-        <div class="search-box" width=130px>
-        <svg viewBox="0 0 16 16" fill="currentColor"><path d="M6 1a5 5 0 100 10A5 5 0 006 1zm4.32 4.32l4.36 4.36-1.41 1.41-4.36-4.36A5 5 0 0010.32 5.32z"/></svg>
-        <input type="text" class="form-control" placeholder="Buscar ID, TAG, local, OM..." oninput="aplicarFiltros()" id="f-busca">
-      </div>
-      <input type="date" class="form-control" id="f-data-ini" onchange="aplicarFiltros()" title="Data inicial">
-      <input type="date" class="form-control" id="f-data-fim" onchange="aplicarFiltros()" title="Data final">
-      <select class="form-control" id="f-site" onchange="aplicarFiltros()"><option value="">Todos os sites</option></select>
-      <select class="form-control" id="f-local" onchange="aplicarFiltros()"><option value="">Todos os locais</option></select>
-      <select class="form-control" id="f-situacao" onchange="aplicarFiltros()">
-        <option value="">Situações</option>
-        <option value="Sistema parado - Crítico">Crítico</option>
-        <option value="Sistema parcialmente parado - Prioritário">Prioritário</option>
-        <option value="Sistema com Restrição - Moderado">Moderado</option>
-        <option value="Sistema operando - Leve">Leve</option>
-      </select>
-      <select class="form-control" id="f-prioridade" onchange="aplicarFiltros()">
-        <option value="">Prioridade</option>
-        <option>P0</option><option>P1</option><option>P2</option><option>P3</option><option>P4</option><option>P5</option>
-      </select>
-        <!-- substituindo este
-          <select class="form-control" id="f-status" onchange="aplicarFiltros()">
-            <option value="">Todos status</option>
-            <option>Aberta</option><option>Em Análise</option><option>Em Andamento</option><option>Concluída</option><option>Cancelada</option>
-          </select>
-        -->
-      <!-- por este-->
-      <div class="multi-select" id="f-status">
-         <button class="multi-select-trigger" onclick="toggleMultiSelect('f-status')" type="button">
-            <span class="multi-select-label">Status</span>
-            <svg class="icon" viewBox="0 0 16 16" fill="currentColor"><path d="M4 6l4 4 4-4"/></svg>
-          </button>
-      <div class="multi-select-dropdown">
-    <label class="multi-select-option"><input type="checkbox" value="Aberta" onchange="aplicarFiltros()"> Aberta</label>
-    <label class="multi-select-option"><input type="checkbox" value="Em Análise" onchange="aplicarFiltros()"> Em Análise</label>
-    <label class="multi-select-option"><input type="checkbox" value="Em Andamento" onchange="aplicarFiltros()"> Em Andamento</label>
-    <label class="multi-select-option"><input type="checkbox" value="Concluída" onchange="aplicarFiltros()"> Concluída</label>
-  </div>
-</div>
-
-<!-- <div class="container">
-  <div id="select" ng-model=""></div>
-</div> -->
-      
-      <!--até aqui -->
-      <select class="form-control" id="f-equipe" onchange="aplicarFiltros()">
-        <option value="">Todas as equipes</option>
-        <option>Manutenção Corretiva</option><option>Manutenção Preventiva</option><option>Inspeção</option><option>PCM</option>
-      </select>
-      <select class="form-control" id="f-solicitante" onchange="aplicarFiltros()"><option value="">Todos solicitantes</option></select>
-      <button class="btn btn-secondary btn-sm" onclick="limparFiltros()">Limpar</button>
-    </div>
-  </div> como fazer para ocultar a class="card" atraes de um botão, mostrar/ocutar filtro
-O Copilot disse
-Toggle para mostrar e ocultar o card de filtros
-Abaixo há duas opções completas e prontas para usar: simples (usa display:none) e com animação suave (usa max-height e opacity). Ambas atualizam aria-expanded para acessibilidade. Cole o CSS após seu styles.css e o JS no final do body.
-
-1 Exemplo HTML com botão de toggle
-html
-
-
-Copiar
-<!-- botão para mostrar/ocultar filtros -->
-<button id="btn-toggle-filtros" class="btn btn-secondary btn-sm" aria-expanded="true" aria-controls="filtros-card">
-  Ocultar filtros
-</button>
-
-<!-- card de filtros existente -->
-<div class="card" style="margin-bottom:16px" id="filtros-card">
-  <div class="filter-bar">
-    <!-- seu conteúdo de filtros aqui -->
-  </div>
-</div>
-2 Opção simples sem animação
-css
-
-
-Copiar
-/* esconder usando display */
-.card.hidden {
-  display: none !important;
-}
-js
-
-
-Copiar
-// JS simples
-const btn = document.getElementById('btn-toggle-filtros');
-const card = document.getElementById('filtros-card');
-
-btn.addEventListener('click', () => {
-  const hidden = card.classList.toggle('hidden');
-  btn.setAttribute('aria-expanded', String(!hidden));
-  btn.textContent = hidden ? 'Mostrar filtros' : 'Ocultar filtros';
-});
-3 Opção com animação suave (recomendada)
-css
-
-
-Copiar
-/* animação suave para colapsar/expandir */
-.card.collapsible {
-  overflow: hidden;
-  transition: max-height .28s ease, opacity .2s ease, margin .2s ease, padding .2s ease;
-  max-height: 1000px;
-  opacity: 1;
-}
-
-.card.collapsible.collapsed {
-  max-height: 0;
-  opacity: 0;
-  margin-bottom: 0;
-  padding-top: 0;
-  padding-bottom: 0;
-  pointer-events: none;
-}
-js
-
-
-Copiar
-// JS com animação
-const btn2 = document.getElementById('btn-toggle-filtros');
-const card2 = document.getElementById('filtros-card');
-
-// garantir classe base
-card2.classList.add('collapsible');
-
-btn2.addEventListener('click', () => {
-  const isCollapsed = card2.classList.toggle('collapsed');
-  btn2.setAttribute('aria-expanded', String(!isCollapsed));
-  btn2.textContent = isCollapsed ? 'Mostrar filtros' : 'Ocultar filtros';
-});
-4 Dicas de integração e acessibilidade
-Onde colocar o botão: no topo da página, dentro da topbar ou logo acima do card.
-
-Acessibilidade: mantenha aria-controls="filtros-card" e atualize aria-expanded.
-
-Fechar ao clicar fora: se quiser fechar o card ao clicar fora, eu posso fornecer um snippet adicional.
-
-Altura dinâmica: se o conteúdo do card for muito alto, ajuste max-height para um valor maior ou calcule dinamicamente a altura via JS para transição perfeita.
-
-Se preferir, eu adapto o botão para ficar dentro do próprio card como um ícone no canto superior direito e já incluo o script para fechar ao clicar fora. Quer que eu faça isso agora?
-
-
-
-
-
-
-
-Editar em uma página
-Você disse
-
-não funcionou
-O Copilot disse
-Solução pronta — toggle que funciona (com debug embutido)
-Cole todo este bloco no final do body (após o HTML do card) ou em um arquivo JS incluído depois do HTML. Ele usa DOMContentLoaded para garantir que os elementos existam, atualiza aria-expanded, faz animação suave e fecha ao clicar fora. Substitui o botão e o card existentes.
-
-html
-
-
-Copiar
-<!-- Botão de toggle (coloque onde quiser) -->
-<button id="btn-toggle-filtros" class="btn btn-secondary btn-sm" aria-expanded="true" aria-controls="filtros-card">
-  Ocultar filtros
-</button>
-
-<!-- Seu card de filtros (mantive id igual ao seu) -->
-<div class="card collapsible" id="filtros-card" style="margin-bottom:16px">
-  <div class="filter-bar">
-    <!-- ...conteúdo dos filtros... -->
-  </div>
-</div>
-
-<!-- CSS (cole após seu styles.css) -->
-<style>
-  /* base para animação suave */
-  .collapsible {
-    overflow: hidden;
-    transition: max-height .28s ease, opacity .2s ease, margin .2s ease, padding .2s ease;
-    max-height: 1200px; /* valor grande o suficiente para o conteúdo */
-    opacity: 1;
-  }
-  .collapsible.collapsed {
-    max-height: 0;
-    opacity: 0;
-    margin-bottom: 0 !important;
-    padding-top: 0 !important;
-    padding-bottom: 0 !important;
-    pointer-events: none;
-  }
-</style>
-
-<!-- JS (cole no final do body) -->
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-  const btn = document.getElementById('btn-toggle-filtros');
-  const card = document.getElementById('filtros-card');
-
-  if (!btn || !card) {
-    console.error('Toggle filtros: elemento não encontrado. Verifique ids: btn-toggle-filtros e filtros-card.');
-    return;
-  }
-
-  // Garante que o card tenha a classe base para animação
-  if (!card.classList.contains('collapsible')) card.classList.add('collapsible');
-
-  // Função para alternar
-  function toggleFiltros() {
-    const isCollapsed = card.classList.toggle('collapsed');
-    btn.setAttribute('aria-expanded', String(!isCollapsed));
-    btn.textContent = isCollapsed ? 'Mostrar filtros' : 'Ocultar filtros';
-  }
-
-  // Clique no botão
-  btn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    toggleFiltros();
-  });
-
-  // Fecha ao clicar fora (opcional)
-  document.addEventListener('click', (e) => {
-    if (card.classList.contains('collapsed')) return; // já fechado
-    if (!card.contains(e.target) && e.target !== btn) {
-      card.classList.add('collapsed');
-      btn.setAttribute('aria-expanded', 'false');
-      btn.textContent = 'Mostrar filtros';
-    }
-  });
-
-  // Fecha com Esc
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && !card.classList.contains('collapsed')) {
-      card.classList.add('collapsed');
-      btn.setAttribute('aria-expanded', 'false');
-      btn.textContent = 'Mostrar filtros';
-      btn.focus();
-    }
-  });
-
-  // Ajuste inicial: se quiser começar oculto, descomente a linha abaixo
-  // card.classList.add('collapsed'); btn.setAttribute('aria-expanded','false'); btn.textContent='Mostrar filtros';
-});
-</script>
-Possíveis motivos do “não funcionou” e como corrigir
-Script carregado antes do HTML → usar DOMContentLoaded (já incluído no snippet).
-
-IDs diferentes → verifique id="btn-toggle-filtros" e id="filtros-card" no HTML.
-
-Conflito de CSS → se outro estilo usa display: none !important, a animação não aparecerá; remova !important ou ajuste.
-
-Erro JS anterior → abra o console do navegador (F12) e veja mensagens; o snippet já loga erro se elementos não existirem.
-
-Botão duplicado → se houver outro botão com mesmo id, o script pode falhar; garanta ids únicos.
-
-Use o snippet acima exatamente como está para testar; se ainda não funcionar, copie a mensagem de erro do console (F12 → Console) e cole aqui que eu corrijo rapidamente.
-
-
-
-
-
-
-
-Editar em uma página
-Você disse
-__ ===============================================.txt
-
-Texto sem Formatação
-
-_!-- TOPBAR --_.txt
-
-Texto sem Formatação
-
-
-analise os codigos css e htm e encontro o erro do botão mostrar filtro
-O Copilot disse
-Diagnóstico rápido
-Revisei o HTML e o CSS que você enviou. Os problemas mais prováveis que impedem o botão de mostrar/ocultar o card de filtros de funcionar são estes:
-
-Inconsistência entre classes CSS e o que o JS altera — no seu CSS existem duas abordagens diferentes:
-
-.card.hidden { display: none !important; }
-
-.collapsible.collapsed { max-height: 0; opacity: 0; }  
-Se o JavaScript adiciona/remova collapsed mas o CSS espera hidden (ou vice‑versa), nada acontece visualmente.
-
-Script não carregado no momento certo — se o JS que faz o toggle for executado antes do HTML existir, os elementos não são encontrados.
-
-IDs duplicados ou incorretos — o script procura #btn-toggle-filtros e #filtros-card; se os ids estiverem diferentes ou duplicados, o script falha.
-
-Erros no console — qualquer erro JS anterior impede execução do restante do script.
-
-Solução robusta (substitui/acompanha o que você já tem)
-Cole este bloco de JavaScript após o HTML (no final do <body>) — ele é tolerante (garante classe base, atualiza aria-expanded, alterna tanto collapsed quanto hidden para compatibilidade) e registra mensagens no console para debug.
-
-html
-
-
-Copiar
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-  const btn = document.getElementById('btn-toggle-filtros');
-  const card = document.getElementById('filtros-card');
-
-  if (!btn || !card) {
-    console.error('Toggle filtros: elemento não encontrado. Verifique ids: btn-toggle-filtros e filtros-card.');
-    return;
-  }
-
-  // Garante classe base para animação (se quiser usar collapsible)
-  if (!card.classList.contains('collapsible')) card.classList.add('collapsible');
-
-  // Função que alterna ambos os modos (collapsed + hidden) para evitar mismatch
-  function toggleFiltros() {
-    const isCollapsed = card.classList.toggle('collapsed');
-    // também alterna a classe hidden para compatibilidade com CSS simples
-    card.classList.toggle('hidden', isCollapsed);
-
-    btn.setAttribute('aria-expanded', String(!isCollapsed));
-    btn.textContent = isCollapsed ? 'Mostrar filtros' : 'Ocultar filtros';
-    console.log('Filtros:', isCollapsed ? 'fechados' : 'abertos');
-  }
-
-  // Clique no botão
-  btn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    toggleFiltros();
-  });
-
-  // Fecha ao clicar fora (opcional)
-  document.addEventListener('click', (e) => {
-    if (card.classList.contains('collapsed')) return;
-    if (!card.contains(e.target) && e.target !== btn) {
-      card.classList.add('collapsed');
-      card.classList.add('hidden');
-      btn.setAttribute('aria-expanded', 'false');
-      btn.textContent = 'Mostrar filtros';
-    }
-  });
-
-  // Fecha com Esc
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && !card.classList.contains('collapsed')) {
-      card.classList.add('collapsed');
-      card.classList.add('hidden');
-      btn.setAttribute('aria-expanded', 'false');
-      btn.textContent = 'Mostrar filtros';
-      btn.focus();
-    }
-  });
-
-  // DEBUG: mostra estado inicial
-  console.log('Toggle filtros inicializado. Estado inicial collapsed=', card.classList.contains('collapsed'));
-});
-</script>
-CSS recomendado (consistente)
-Use uma abordagem. Se preferir animação suave, mantenha .collapsible + .collapsed. Se preferir simples display:none, use .hidden. Aqui está a versão animada (já presente no seu CSS, apenas confirme que está carregada):
-
-css
-
-
-Copiar
-/* animação suave (mantê-la no seu styles.css) */
-.card.collapsible {
-  overflow: hidden;
-  transition: max-height .28s ease, opacity .2s ease, margin .2s ease, padding .2s ease;
-  max-height: 1200px;
-  opacity: 1;
-}
-.card.collapsible.collapsed {
-  max-height: 0;
-  opacity: 0;
-  margin-bottom: 0 !important;
-  padding-top: 0 !important;
-  padding-bottom: 0 !important;
-  pointer-events: none;
-}
-
-/* compatibilidade simples */
-.card.hidden { display: none !important; }
-Checklist de verificação (faça estes passos)
-Coloque o <script> acima no final do <body>, depois do HTML do #filtros-card.
-
-Abra o console do navegador (F12 → Console) e recarregue a página. Verifique se aparecem as mensagens de debug.
-
-Confirme que existe apenas um elemento com id="btn-toggle-filtros" e apenas um com id="filtros-card".
-
-Se o botão ainda não responder, copie qualquer erro do console e cole aqui.
-
-Se preferir o comportamento sem animação, remova as classes collapsible/collapsed e use apenas hidden (o script já alterna ambas).
-
-Observações finais
-Se você usou anteriormente um snippet diferente (por exemplo, que só alternava hidden), esse mismatch é a causa mais comum do “não funcionou”.
-
-Posso gerar uma versão do script que calcula dinamicamente max-height para transições perfeitas (sem precisar de um max-height grande) se quiser animação mais suave e sem cortes.
-
-Se quiser, eu já insiro o <script> e o CSS final diretamente no seu arquivo (mostre onde você prefere o botão) e testo mentalmente os pontos de falha — cole aqui o erro do console se houver.
-
-
-
-
-
-
-
-Editar em uma página
-Você disse
-
-como fazer para que ele inicie oculto
-O Copilot disse
-Iniciar o card de filtros oculto
-Você tem duas opções simples. Use HTML/CSS (mais direto) ou JS (se preferir controlar por script).
-
-1. Método rápido — HTML + CSS (recomendado)
-Adicione a classe que já existe no seu CSS ao elemento #filtros-card e ajuste o botão:
-
-html
-
-
-Copiar
-<!-- botão já com aria-expanded false -->
-<button id="btn-toggle-filtros" class="btn btn-secondary btn-sm" aria-expanded="false" aria-controls="filtros-card">
-  Mostrar filtros
-</button>
-
-<!-- card inicia oculto -->
-<div class="card collapsible collapsed hidden" id="filtros-card" style="margin-bottom:16px">
-  <!-- conteúdo -->
-</div>
-Por que funciona: seu CSS já define .card.hidden { display: none !important; } e .collapsible.collapsed { max-height:0; opacity:0; }. Ao adicionar collapsed ou hidden no HTML, o card já inicia oculto sem JS.
-
-2. Método via JavaScript (se preferir controlar dinamicamente)
-Se quiser manter o HTML limpo e ocultar por script ao carregar a página, cole este JS após o HTML (final do <body>):
-
-html
-
-
-Copiar
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-  const btn = document.getElementById('btn-toggle-filtros');
-  const card = document.getElementById('filtros-card');
-  if (!btn || !card) return;
-
-  // inicia oculto
-  card.classList.add('collapsed', 'hidden');
-  btn.setAttribute('aria-expanded', 'false');
-  btn.textContent = 'Mostrar filtros';
-});
-</script>
-Observações importantes
-Escolha apenas uma abordagem (HTML inicial ou JS) para evitar conflitos.
-
-Se usar animação, mantenha .collapsible no card e adicione collapsed para iniciar oculto.
-
-Verifique que não haja outro script sobrescrevendo aria-expanded ou removendo classes.
-
-Quer que eu gere a versão final do seu trecho HTML com o card já oculto e o botão posicionado na page-header?
-
-
-
-
-
-
-
-Editar em uma página
-Você disse
-
-como colocar a imagem do filtro no botão mostrar filtro
-O Copilot disse
-Adicionar ícone ao botão Mostrar filtros
-Abaixo estão duas opções prontas (SVG inline ou background-image). Ambas atualizam o texto e o aria-expanded automaticamente quando o botão é clicado. Cole o CSS no seu styles.css e o JS no final do body (após o HTML).
-
-1 — SVG inline (recomendado)
-HTML (substitua o botão existente):
-
-html
-
-
-Copiar
-<button id="btn-toggle-filtros" class="btn btn-secondary btn-sm" aria-expanded="false" aria-controls="filtros-card">
-  <span class="btn-icon-left" aria-hidden="true">
-    <!-- ícone de filtro -->
-    <svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor"><path d="M3 4h10l-4 5v3l-2 1v-4L3 4z"/></svg>
-  </span>
-  <span class="btn-label">Mostrar filtros</span>
-</button>
-CSS
-
-css
-
-
-Copiar
-/* alinhamento do ícone no botão */
-#btn-toggle-filtros { display:inline-flex; align-items:center; gap:8px; }
-#btn-toggle-filtros .btn-icon-left svg { display:block; color:var(--text2); }
-#btn-toggle-filtros[aria-expanded="true"] .btn-icon-left svg { color:var(--blue-light); }
-JS
-
-html
-
-
-Copiar
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-  const btn = document.getElementById('btn-toggle-filtros');
-  const card = document.getElementById('filtros-card');
-  if (!btn || !card) return;
-
-  // inicia oculto se preferir (opcional)
-  // card.classList.add('collapsed','hidden'); btn.setAttribute('aria-expanded','false'); btn.querySelector('.btn-label').textContent='Mostrar filtros';
-
-  function setState(isOpen) {
-    btn.setAttribute('aria-expanded', String(isOpen));
-    btn.querySelector('.btn-label').textContent = isOpen ? 'Ocultar filtros' : 'Mostrar filtros';
-  }
-
-  btn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    const isOpen = btn.getAttribute('aria-expanded') === 'true';
-    // alterna classes do card (compatível com seu CSS)
-    card.classList.toggle('collapsed', !isOpen);
-    card.classList.toggle('hidden', !isOpen);
-    setState(!isOpen);
-  });
-});
-</script>
-2 — Trocar ícone conforme estado (filtro / fechar)
-Se quiser trocar o ícone (ex.: ícone de filtro quando fechado e ícone de fechar quando aberto), use este HTML e JS:
-
-HTML
-
-html
-
-
-Copiar
-<button id="btn-toggle-filtros" class="btn btn-secondary btn-sm" aria-expanded="false" aria-controls="filtros-card">
-  <span class="btn-icon-left" aria-hidden="true">
-    <svg class="icon-filter" viewBox="0 0 16 16" width="14" height="14" fill="currentColor"><path d="M3 4h10l-4 5v3l-2 1v-4L3 4z"/></svg>
-    <svg class="icon-close" viewBox="0 0 16 16" width="14" height="14" fill="currentColor" style="display:none"><path d="M3 3l10 10M13 3L3 13"/></svg>
-  </span>
-  <span class="btn-label">Mostrar filtros</span>
-</button>
-JS
-
-html
-
-
-Copiar
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-  const btn = document.getElementById('btn-toggle-filtros');
-  const card = document.getElementById('filtros-card');
-  const iconFilter = btn.querySelector('.icon-filter');
-  const iconClose = btn.querySelector('.icon-close');
-  const label = btn.querySelector('.btn-label');
-
-  if (!btn || !card) return;
-
-  function updateUI(isOpen) {
-    label.textContent = isOpen ? 'Ocultar filtros' : 'Mostrar filtros';
-    iconFilter.style.display = isOpen ? 'none' : 'block';
-    iconClose.style.display = isOpen ? 'block' : 'none';
-    btn.setAttribute('aria-expanded', String(isOpen));
-  }
-
-  // estado inicial (se quiser iniciar oculto, passe false)
-  updateUI(false);
-
-  btn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    const isOpen = btn.getAttribute('aria-expanded') === 'true';
-    card.classList.toggle('collapsed', isOpen); // se estava aberto, fecha
-    card.classList.toggle('hidden', isOpen);
-    updateUI(!isOpen);
-  });
-});
-</script>
-Observações rápidas
-SVG inline mantém cores do tema (currentColor) e facilita estilização com CSS.
-
-Acessibilidade: mantenha aria-expanded e aria-controls atualizados.
-
-Alinhamento: use display:inline-flex e gap para manter espaçamento consistente com seus botões existentes.
-
-Iniciar oculto: adicione collapsed hidden ao #filtros-card no HTML ou chame card.classList.add('collapsed','hidden') no DOMContentLoaded.
-
-Se quiser, eu adapto o ícone (SVG) para o estilo exato do seu projeto ou insiro o snippet diretamente no seu arquivo HTML/CSS atual.
-
-
-
-
-
-
-
-Editar em uma página
-Você disse
-
-o filtro só esta abrindo no segundo click
-O Copilot disse
-Causa provável
-O comportamento “abre só no segundo clique” normalmente acontece quando a lógica que decide se o card deve abrir ou fechar está invertida ou depende de um atributo (aria-expanded) que só é atualizado depois da verificação. Outro motivo comum é usar classList.toggle com o valor booleano invertido.
-
-Correção simples e confiável
-Substitua o seu manipulador de clique pelo código abaixo. Ele lê o estado atual (aria-expanded), calcula o novo estado, aplica/remova classes de forma explícita (não invertida) e atualiza o texto/ícone. Cole este script após o HTML (final do <body>) ou no seu arquivo JS carregado depois do DOM.
-
-html
-
-
-Copiar
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-  const btn = document.getElementById('btn-toggle-filtros');
-  const card = document.getElementById('filtros-card');
-  if (!btn || !card) return;
-
-  // Estado inicial consistente (opcional)
-  // Se quiser iniciar oculto, descomente as linhas abaixo:
-  // card.classList.add('collapsed', 'hidden');
-  // btn.setAttribute('aria-expanded', 'false');
-  // btn.querySelector('.btn-label')?.textContent = 'Mostrar filtros';
-
-  btn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    // lê estado atual (true/false)
-    const isOpen = btn.getAttribute('aria-expanded') === 'true';
-    // novo estado será o inverso
-    const newOpen = !isOpen;
-
-    if (newOpen) {
-      // abrir: remover classes que escondem
-      card.classList.remove('collapsed', 'hidden');
-    } else {
-      // fechar: adicionar classes que escondem
-      card.classList.add('collapsed', 'hidden');
-    }
-
-    // atualizar atributo e texto do botão
-    btn.setAttribute('aria-expanded', String(newOpen));
-    const label = btn.querySelector('.btn-label');
-    if (label) label.textContent = newOpen ? 'Ocultar filtros' : 'Mostrar filtros';
-
-    // se trocar ícones, atualize visibilidade aqui (exemplo)
-    const iconFilter = btn.querySelector('.icon-filter');
-    const iconClose = btn.querySelector('.icon-close');
-    if (iconFilter && iconClose) {
-      iconFilter.style.display = newOpen ? 'none' : 'block';
-      iconClose.style.display = newOpen ? 'block' : 'none';
-    }
-  });
-
-  // opcional: fechar ao clicar fora
-  document.addEventListener('click', (ev) => {
-    if (!card.classList.contains('collapsed') && !card.contains(ev.target) && ev.target !== btn) {
-      card.classList.add('collapsed', 'hidden');
-      btn.setAttribute('aria-expanded', 'false');
-      btn.querySelector('.btn-label')?.textContent = 'Mostrar filtros';
-    }
-  });
-});
-</script>
-Por que isso resolve
-Lê o estado atual do botão e calcula explicitamente o novo estado, evitando dependência de toggles invertidos.
-
-Aplica/remova classes explicitamente (add/remove) em vez de usar toggle com lógica ambígua.
-
-Atualiza aria-expanded antes de qualquer próxima leitura, evitando condições de corrida.
-
-Testes rápidos
-Cole o script no final do body.
-
-Abra o console (F12) e recarregue a página.
-
-Clique no botão — deve abrir no primeiro clique; clicar de novo fecha.
-
-Teste também clicar fora para fechar (se deixou a parte opcional).
-
-Se ainda não abrir no primeiro clique, cole aqui o trecho atual do seu script (ou qualquer erro que apareça no console) que eu ajusto imediatamente.
-
-
-
-
-
-
-
-Editar em uma página
-Você disse
-
-document.addEventListener('DOMContentLoaded', () => {
-  document.querySelectorAll('.modal-overlay').forEach(m => {
-    m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
-  });
-
-
-
-  const btn = document.getElementById('btn-toggle-filtros');
-  const card = document.getElementById('filtros-card');
-  const iconFilter = btn.querySelector('.icon-filter');
-  const iconClose = btn.querySelector('.icon-close');
-  const label = btn.querySelector('.btn-label');
-
-  if (!btn || !card) return;
-
-  function updateUI(isOpen) {
-    label.textContent = isOpen ? 'Ocultar filtros' : 'Mostrar filtros';
-    iconFilter.style.display = isOpen ? 'none' : 'block';
-    iconClose.style.display = isOpen ? 'block' : 'none';
-    btn.setAttribute('aria-expanded', String(isOpen));
-  }
-
-  // estado inicial (se quiser iniciar oculto, passe false)
-  updateUI(false);
-
-  btn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    const isOpen = btn.getAttribute('aria-expanded') === 'true';
-    card.classList.toggle('collapsed', isOpen); // se estava aberto, fecha
-    card.classList.toggle('hidden', isOpen);
-    updateUI(!isOpen);
-  });
-
-
-
-});    <div class="page-header-actions">
-      <button id="btn-toggle-filtros" class="btn btn-secondary btn-sm" aria-expanded="false" aria-controls="filtros-card">
-        <span class="btn-icon-left" aria-hidden="true">
-          <svg class="icon-filter" viewBox="0 0 16 16" width="14" height="14" fill="currentColor"><path d="M3 4h10l-4 5v3l-2 1v-4L3 4z"/></svg>
-          <svg class="icon-close" viewBox="0 0 16 16" width="14" height="14" fill="currentColor" style="display:none"><path d="M3 3l10 10M13 3L3 13"/></svg>
-        </span>
-        <span class="btn-label">Mostrar filtros</span>
-      </button>
-      <button class="btn btn-secondary btn-sm" onclick="exportExcel()">
-        <svg class="icon" viewBox="0 0 16 16" fill="currentColor"><path d="M2 2h8l4 4v8H2V2zm7-1v5h5M5 9l2 2-2 2M11 9l-2 2 2 2"/></svg>
-        Exportar Excel
-      </button>
-      <button class="btn btn-primary" onclick="openNovaDemanda(null)">
-        <svg class="icon" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1v14M1 8h14"/></svg>
-        Nova Demanda
-      </button>
-    </div>  corija os codigos
-O Copilot disse
-Correção aplicada — resumo
-O problema do “abrir só no segundo clique” vinha da lógica que invertia classes com base no estado lido depois de atualizar aria-expanded ou sem checar corretamente elementos que podiam ser null. Abaixo está um snippet completo (HTML + CSS mínimo + JS) pronto para substituir o trecho atual. Ele:
-
-inicia o card oculto;
-
-atualiza aria-expanded corretamente;
-
-alterna classes explicitamente (add / remove);
-
-troca ícones e texto no primeiro clique;
-
-protege contra elementos inexistentes.
-
-Cole o HTML no lugar do seu botão atual e do #filtros-card, e o JS no final do body (após o HTML). O CSS pode ser adicionado ao seu styles.css (ou mantido se já existir).
-
-HTML (botão + card — substitua os existentes)
-html
-
-
-Copiar
-<!-- Botão de toggle (coloque na page-header-actions) -->
-<button id="btn-toggle-filtros" class="btn btn-secondary btn-sm" aria-expanded="false" aria-controls="filtros-card">
-  <span class="btn-icon-left" aria-hidden="true">
-    <svg class="icon-filter" viewBox="0 0 16 16" width="14" height="14" fill="currentColor"><path d="M3 4h10l-4 5v3l-2 1v-4L3 4z"/></svg>
-    <svg class="icon-close" viewBox="0 0 16 16" width="14" height="14" fill="currentColor" style="display:none"><path d="M3 3l10 10M13 3L3 13"/></svg>
-  </span>
-  <span class="btn-label">Mostrar filtros</span>
-</button>
-
-<!-- Card de filtros (inicia oculto) -->
-<div class="card collapsible collapsed hidden" id="filtros-card" style="margin-bottom:16px">
-  <div class="filter-bar">
-    <!-- ...seu conteúdo de filtros aqui (mantido) ... -->
-  </div>
-</div>
-CSS mínimo (se já tiver .collapsible/.hidden no seu styles.css, não precisa repetir)
-css
-
-
-Copiar
-/* apenas caso não exista no styles.css */
-.card.collapsible {
-  overflow: hidden;
-  transition: max-height .28s ease, opacity .2s ease, margin .2s ease, padding .2s ease;
-  max-height: 1200px;
-  opacity: 1;
-}
-.card.collapsible.collapsed {
-  max-height: 0;
-  opacity: 0;
-  margin-bottom: 0 !important;
-  padding-top: 0 !important;
-  padding-bottom: 0 !important;
-  pointer-events: none;
-}
-.card.hidden { display: none !important; }
-
-/* estilo do botão com ícone */
-#btn-toggle-filtros { display:inline-flex; align-items:center; gap:8px; }
-#btn-toggle-filtros .btn-icon-left svg { color:var(--text2); }
-#btn-toggle-filtros[aria-expanded="true"] .btn-icon-left svg { color:var(--blue-light); }
-JavaScript (cole no final do <body>, depois do HTML)
-html
-
-
-Copiar
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-  const btn = document.getElementById('btn-toggle-filtros');
-  const card = document.getElementById('filtros-card');
-
-  if (!btn) {
-    console.error('btn-toggle-filtros não encontrado.');
-    return;
-  }
-  if (!card) {
-    console.error('filtros-card não encontrado.');
-    return;
-  }
-
-  // referências seguras aos ícones/label (podem ser null)
-  const iconFilter = btn.querySelector('.icon-filter');
-  const iconClose = btn.querySelector('.icon-close');
-  const label = btn.querySelector('.btn-label');
-
-  // Função que aplica estado (aberto = true, fechado = false)
-  function applyState(isOpen) {
-    if (isOpen) {
-      card.classList.remove('collapsed', 'hidden');
-    } else {
-      card.classList.add('collapsed', 'hidden');
-    }
-
-    btn.setAttribute('aria-expanded', String(isOpen));
-    if (label) label.textContent = isOpen ? 'Ocultar filtros' : 'Mostrar filtros';
-    if (iconFilter) iconFilter.style.display = isOpen ? 'none' : 'block';
-    if (iconClose) iconClose.style.display = isOpen ? 'block' : 'none';
-  }
-
-  // Estado inicial: fechado (false). Remova se quiser iniciar aberto.
-  applyState(false);
-
-  // Clique no botão: alterna explicitamente
-  btn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    const isOpen = btn.getAttribute('aria-expanded') === 'true';
-    applyState(!isOpen);
-  });
-
-  // Fecha ao clicar fora (opcional)
-  document.addEventListener('click', (ev) => {
-    if (btn.contains(ev.target)) return;
-    if (!card.classList.contains('collapsed') && !card.contains(ev.target)) {
-      applyState(false);
-    }
-  });
-
-  // Fecha com Esc
-  document.addEventListener('keydown', (ev) => {
-    if (ev.key === 'Escape' && btn.getAttribute('aria-expanded') === 'true') {
-      applyState(false);
-      btn.focus();
-    }
-  });
-});
-</script>
-Verificações rápidas se ainda não funcionar
-Confirme que não há outro script que também manipule #btn-toggle-filtros ou #filtros-card. Conflitos de scripts causam comportamento estranho.
-
-Remova event listeners duplicados (procure por outros addEventListener('click', ...) no projeto).
-
-Abra o console (F12 → Console) e verifique se aparecem mensagens de erro. Se houver, cole aqui que eu corrijo.
-
-Se quiser, eu adapto o applyState para usar apenas collapsed (sem hidden) ou para animar a altura dinamicamente (calcular scrollHeight) — diga qual comportamento prefere.
-
-
-
-
-
-
-
-Editar em uma página
-Você disse
-
-quando o filtro esta ativo não esta mostrando a imagem no botão
-O Copilot disse
-O problema é que o ícone está sendo escondido por conflito entre estilos/atributos e pela forma como o JS alterna visibilidade. Vou te dar uma correção simples e robusta: remova style="display:none" dos SVGs no HTML, deixe o CSS controlar aparência e o JS controlar apenas o estado (mostrar/ocultar). Também garanta que o seletor CSS não esteja sobrescrevendo display dos SVGs.
-
-Cole estes trechos (HTML, CSS e JS) no lugar dos atuais — eles resolvem o problema de forma explícita e segura.
-
-HTML (botão — sem style="display:none" nos SVGs)
-html
-
-
-Copiar
-<button id="btn-toggle-filtros" class="btn btn-secondary btn-sm" aria-expanded="false" aria-controls="filtros-card">
-  <span class="btn-icon-left" aria-hidden="true">
-    <svg class="icon-filter" viewBox="0 0 16 16" width="14" height="14" fill="currentColor">
-      <path d="M3 4h10l-4 5v3l-2 1v-4L3 4z"/>
-    </svg>
-    <svg class="icon-close" viewBox="0 0 16 16" width="14" height="14" fill="currentColor">
-      <path d="M3 3l10 10M13 3L3 13"/>
-    </svg>
-  </span>
-  <span class="btn-label">Mostrar filtros</span>
-</button>
-CSS (garante cor e visibilidade padrão)
-css
-
-
-Copiar
-/* garante que ambos os svgs estejam visíveis por padrão; JS decide qual mostrar */
-#btn-toggle-filtros .btn-icon-left svg { display: inline-block; color: var(--text2); }
-#btn-toggle-filtros .icon-close { display: none; } .btn-icon-left svg { color: var(--blue-light); } /* fecha por padrão */
-#btn-toggle-filtros[aria-expanded="true"] .btn-icon-left svg { color: var(--blue-light); }
