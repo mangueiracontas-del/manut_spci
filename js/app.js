@@ -54,7 +54,7 @@ function aplicarFiltros() {
 
   filteredDemandas = allDemandas.filter(d => {
     const st = d.status || 'Aberta';
-    if (busca && ![d.id,d.tag,d.local,d.descricao,d.solicitante,d.om].some(v => (v||'').toLowerCase().includes(busca))) return false;
+    if (busca && ![d.site,d.tag,d.local,d.descricao,d.solicitante,d.om].some(v => (v||'').toLowerCase().includes(busca))) return false;
     if (dIni && d.data < dIni) return false;
     if (dFim && d.data > dFim) return false;
     if (site && d.site !== site) return false;

@@ -80,6 +80,7 @@ svg.icon{width:16px;height:16px;flex-shrink:0}
 .form-group{
   margin-bottom:16px;
 }
+
 .form-label{
   display:block;
   font-size:12px;
@@ -91,7 +92,7 @@ svg.icon{width:16px;height:16px;flex-shrink:0}
 }
 
 .form-control{
-  width:100%;
+  width: 100%;
   background:var(--bg3);
   border:1px solid var(--border);
   border-radius:var(--radius);
@@ -108,7 +109,7 @@ svg.icon{width:16px;height:16px;flex-shrink:0}
 }
 
 .form-control::placeholder{
-  color:var(--text3)
+  color:var(--text3);
 }
 
 textarea.form-control{
@@ -129,6 +130,7 @@ select.form-control{
   appearance: none;
 }
 */
+/* === HARMONIZAÇÃO DE CORES PARA SELECT === */
 select.form-control option{
   background:var(--bg3);
   color:var(--text);
@@ -141,7 +143,8 @@ select.form-control option{
 }
 /* termina aqui*/
 
-/* FILTER BAR */
+/* FILTER BAR Antigo*/
+/*
 .filter-bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
 .filter-bar .form-control{width:auto;min-width:130px;height:36px;padding:0 32px 0 10px;font-size:13px}
 .filter-bar select.form-control{background-position:right 8px center}
@@ -149,6 +152,20 @@ select.form-control option{
 .search-box{position:relative;flex:1 1 220px;min-width:180px;max-width:320px}
 .search-box input{padding-left:34px !important;height:36px}
 .search-box svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--text3);pointer-events:none;width:15px;height:15px}
+*/
+/* FILTER BAR Novo*/
+.filter-bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+.filter-bar .form-control{width:auto;min-width:130px;height:36px;padding:0 32px 0 10px;font-size:13px;transition:border-color .15s,box-shadow .15s;}
+.filter-bar .form-control:hover{border-color:var(--blue-light);}
+.filter-bar .form-control:focus, .filter-bar .form-control:active{border-color:var(--blue-light) !important;box-shadow:0 0 0 3px rgba(31,111,235,.15) !important;}
+.filter-bar select.form-control{background-position:right 8px center}
+.filter-bar input.form-control{min-width:130px;padding:0 10px;height:36px}
+.search-box{position:relative;flex:1 1 220px;min-width:180px;max-width:320px}
+.search-box input{padding-left:34px !important;height:36px}
+.search-box svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--text3);pointer-events:none;width:15px;height:15px}
+/* Hover/focus harmonizado para multi-select dentro da filter-bar */
+.filter-bar .multi-select-trigger:hover{border-color:var(--blue-light);}
+.filter-bar .multi-select:focus-within .multi-select-trigger{border-color:var(--blue-light);box-shadow:0 0 0 3px rgba(31,111,235,.15);}
 
 /* TABLE */
 .table-wrap{overflow-x:auto;border-radius:var(--radius-lg);border:1px solid var(--border)}
@@ -296,7 +313,7 @@ tbody tr:hover td{background:var(--bg3);cursor:pointer}
   border: 1px solid var(--border);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
-  padding: 8px;
+  padding: 4px;
   display: none;
   min-width: 100%;
   box-sizing: border-box;
@@ -310,7 +327,7 @@ tbody tr:hover td{background:var(--bg3);cursor:pointer}
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 8px 10px;
+  padding: 4px 5px;
   border-radius: 6px;
   font-size: 13px;
   cursor: pointer;
@@ -334,6 +351,7 @@ tbody tr:hover td{background:var(--bg3);cursor:pointer}
   min-width: 130px;
 }
 
+/* Tamanho do componente */
 .filter-bar .multi-select-trigger {
   height: 36px;
   padding: 0 32px 0 10px;

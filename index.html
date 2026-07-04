@@ -74,7 +74,7 @@
     <div class="filter-bar">
         <div class="search-box" width=130px>
         <svg viewBox="0 0 16 16" fill="currentColor"><path d="M6 1a5 5 0 100 10A5 5 0 006 1zm4.32 4.32l4.36 4.36-1.41 1.41-4.36-4.36A5 5 0 0010.32 5.32z"/></svg>
-        <input type="text" class="form-control" placeholder="Buscar ID, TAG, local, OM..." oninput="aplicarFiltros()" id="f-busca">
+        <input type="text" class="form-control" placeholder="Buscar Site, TAG, local, OM..." oninput="aplicarFiltros()" id="f-busca">
       </div>
       <input type="date" class="form-control" id="f-data-ini" onchange="aplicarFiltros()" title="Data inicial">
       <input type="date" class="form-control" id="f-data-fim" onchange="aplicarFiltros()" title="Data final">
@@ -91,13 +91,6 @@
         <option value="">Prioridade</option>
         <option>P0</option><option>P1</option><option>P2</option><option>P3</option><option>P4</option><option>P5</option>
       </select>
-        <!-- substituindo este
-          <select class="form-control" id="f-status" onchange="aplicarFiltros()">
-            <option value="">Todos status</option>
-            <option>Aberta</option><option>Em Análise</option><option>Em Andamento</option><option>Concluída</option><option>Cancelada</option>
-          </select>
-        -->
-      <!-- por este-->
       <div class="multi-select" id="f-status">
          <button class="multi-select-trigger" onclick="toggleMultiSelect('f-status')" type="button">
             <span class="multi-select-label">Status</span>
@@ -110,12 +103,6 @@
     <label class="multi-select-option"><input type="checkbox" value="Concluída" onchange="aplicarFiltros()"> Concluída</label>
   </div>
 </div>
-
-<!-- <div class="container">
-  <div id="select" ng-model=""></div>
-</div> -->
-      
-      <!--até aqui -->
       <select class="form-control" id="f-equipe" onchange="aplicarFiltros()">
         <option value="">Todas as equipes</option>
         <option>Manutenção Corretiva</option><option>Manutenção Preventiva</option><option>Inspeção</option><option>PCM</option>
