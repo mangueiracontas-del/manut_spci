@@ -93,6 +93,7 @@ svg.icon{width:16px;height:16px;flex-shrink:0}
 .form-control{
   width:100%;
   background:var(--bg3);
+  border:1px solid var(--border);
   border-radius:var(--radius);
   color:var(--text);
   padding:9px 12px;
@@ -238,6 +239,7 @@ tbody tr:hover td{background:var(--bg3);cursor:pointer}
   height: 36px;
   padding: 0 32px 0 10px;
   background-color: var(--bg3);
+  border:1px solid var(--border);
   border-radius: var(--radius);
   color: var(--text);
   font-family: var(--font);
