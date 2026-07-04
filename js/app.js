@@ -4,12 +4,26 @@
 
 let allDemandas      = [];
 let filteredDemandas = [];
+let allSites         = [];
+let allLocais        = [];
 let editingId        = null;
+let editingSiteId    = null;
+let editingLocalId   = null;
 
 // ---- ID ----
 function gerarID() {
   const d = new Date();
   return 'DM-' + d.getFullYear() + String(d.getMonth() + 1).padStart(2, '0') + '-' + Math.floor(1000 + Math.random() * 9000);
+}
+
+function gerarIDSite() {
+  const d = new Date();
+  return 'ST-' + d.getFullYear() + String(d.getMonth() + 1).padStart(2, '0') + '-' + Math.floor(100 + Math.random() * 900);
+}
+
+function gerarIDLocal() {
+  const d = new Date();
+  return 'LC-' + d.getFullYear() + String(d.getMonth() + 1).padStart(2, '0') + '-' + Math.floor(100 + Math.random() * 900);
 }
 
 // ---- Carregar ----
@@ -25,6 +39,32 @@ async function loadDemandas() {
   }
   popularFiltros();
   aplicarFiltros();
+}
+
+async function loadSites() {
+  mostrarLoading(true);
+  try {
+    allSites = await dbCarregarSites();
+    allSites.sort((a, b) => (a.nome || '').localeCompare(b.nome || ''));
+  } catch(e) {
+    toast('Erro ao carregar sites: ' + e.message, 'error');
+  } finally {
+    mostrarLoading(false);
+  }
+  renderSitesTable();
+}
+
+async function loadLocais() {
+  mostrarLoading(true);
+  try {
+    allLocais = await dbCarregarLocais();
+    allLocais.sort((a, b) => (a.nome || '').localeCompare(b.nome || ''));
+  } catch(e) {
+    toast('Erro ao carregar locais: ' + e.message, 'error');
+  } finally {
+    mostrarLoading(false);
+  }
+  renderLocaisTable();
 }
 
 // ---- Filtros ----
@@ -48,7 +88,7 @@ function aplicarFiltros() {
   const situacao = document.getElementById('f-situacao').value;
   const prio     = document.getElementById('f-prioridade').value;
   const statusSelecionados = getMultiSelectValues('f-status');
-  
+
   const equipe   = document.getElementById('f-equipe').value;
   const sol      = document.getElementById('f-solicitante').value;
 
@@ -62,17 +102,23 @@ function aplicarFiltros() {
     if (situacao && d.situacao !== situacao) return false;
     if (prio && d.prioridade !== prio) return false;
     if (statusSelecionados.length > 0 && !statusSelecionados.includes(d.status)) return false;
-    
+
     if (equipe && d.equipe !== equipe) return false;
     if (sol && d.solicitante !== sol) return false;
     return true;
   });
 
   const pd = { P0:0, P1:1, P2:2, P3:3, P4:4, P5:5 };
+  const st = { 'Aberta':0, 'Em Análise':1, 'Em Andamento':2, 'Concluída':3, 'Cancelada':4 };
   filteredDemandas.sort((a, b) => {
-    const dd = new Date(b.data) - new Date(a.data);
-    if (dd !== 0) return dd;
-    return (pd[a.prioridade] ?? 99) - (pd[b.prioridade] ?? 99);
+      // 1º critério: status (Concluída e Cancelada vão para o final)
+      const statusDiff = (st[a.status || 'Aberta'] ?? 0) - (st[b.status || 'Aberta'] ?? 0);
+      if (statusDiff !== 0) return statusDiff;
+      // 2º critério: prioridade (menor número = mais prioritário)
+      const prioDiff = (pd[a.prioridade] ?? 99) - (pd[b.prioridade] ?? 99);
+      if (prioDiff !== 0) return prioDiff;
+      // 3º critério: data (mais recente primeiro)
+      return new Date(b.data) - new Date(a.data);
   });
   renderDemandasTable();
   renderStats();
@@ -89,7 +135,7 @@ function limparFiltros() {
 // ---- Badges ----
 function situacaoBadge(s) {
   const map = { 'Sistema parado - Crítico':'badge-red', 'Sistema parcialmente parado - Prioritário':'badge-orange', 'Sistema com Restrição - Moderado':'badge-yellow', 'Sistema operando - Leve':'badge-green' };
-  return `<span class="badge ${map[s]||'badge-gray'}">${s ? s.split(' - ')[1]||s : '—'}</span>`;
+  return `<span class="badge ${map[s]||'badge-gray'} no-border">${s ? s.split(' - ')[1]||s : '—'}</span>`;
 }
 function statusBadge(s) {
   const map = { 'Aberta':'badge-blue', 'Em Análise':'badge-purple', 'Em Andamento':'badge-orange', 'Concluída':'badge-green', 'Cancelada':'badge-gray' };
@@ -104,10 +150,10 @@ function prioBadge(p) {
 function equipeBadge(e) {
   const map = { 'Manutenção Corretiva':'badge-red', 'Manutenção Preventiva':'badge-orange', 'Inspeção':'badge-yellow', 'PCM':'badge-purple' };
   if (!e) return '<span style="color:var(--text3);font-size:12px">—</span>';
-  return `<span class="badge ${map[e]||'badge-gray'}" style="font-size:11px">${e}</span>`;
+  return `<span class="badge ${map[e]||'badge-gray'} no-border" style="font-size:11px">${e}</span>`;
 }
 
-// ---- Tabela ----
+// ---- Tabela Demandas ----
 function renderDemandasTable() {
   const tbody = document.getElementById('demandas-tbody');
   const empty = document.getElementById('empty-demandas');
@@ -172,6 +218,69 @@ function renderStats() {
   `;
 }
 
+// ---- Tabela Sites ----
+function renderSitesTable() {
+  const tbody = document.getElementById('sites-tbody');
+  const empty = document.getElementById('empty-sites');
+  if (!allSites.length) { tbody.innerHTML = ''; empty.style.display = 'block'; return; }
+  empty.style.display = 'none';
+
+  tbody.innerHTML = allSites.map(s => `
+    <tr>
+      <td class="td-mono">${esc(s.id)}</td>
+      <td><strong>${esc(s.nome)}</strong></td>
+      <td style="max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${esc(s.descricao||'')}">${esc(s.descricao||'—')}</td>
+      <td>
+        <div style="display:flex;gap:4px">
+          <button class="btn btn-secondary btn-sm btn-icon" title="Editar" onclick="openModalSite('${s.id}')">
+            <svg class="icon" viewBox="0 0 16 16" fill="currentColor"><path d="M11.5 1l3 3L5 13.5 1.5 10 11.5 1z"/></svg>
+          </button>
+          <button class="btn btn-danger btn-sm btn-icon" title="Excluir" onclick="excluirSite('${s.id}')">
+            <svg class="icon" viewBox="0 0 16 16" fill="currentColor"><path d="M2 4h12M5 4V2h6v2M6 7v5M10 7v5M3 4l1 10h8l1-10"/></svg>
+          </button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+// ---- Tabela Locais ----
+function renderLocaisTable() {
+  const tbody = document.getElementById('locais-tbody');
+  const empty = document.getElementById('empty-locais');
+  if (!allLocais.length) { tbody.innerHTML = ''; empty.style.display = 'block'; return; }
+  empty.style.display = 'none';
+
+  tbody.innerHTML = allLocais.map(l => `
+    <tr>
+      <td class="td-mono">${esc(l.id)}</td>
+      <td><strong>${esc(l.nome)}</strong></td>
+      <td style="max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${esc(l.descricao||'')}">${esc(l.descricao||'—')}</td>
+      <td>
+        <div style="display:flex;gap:4px">
+          <button class="btn btn-secondary btn-sm btn-icon" title="Editar" onclick="openModalLocal('${l.id}')">
+            <svg class="icon" viewBox="0 0 16 16" fill="currentColor"><path d="M11.5 1l3 3L5 13.5 1.5 10 11.5 1z"/></svg>
+          </button>
+          <button class="btn btn-danger btn-sm btn-icon" title="Excluir" onclick="excluirLocal('${l.id}')">
+            <svg class="icon" viewBox="0 0 16 16" fill="currentColor"><path d="M2 4h12M5 4V2h6v2M6 7v5M10 7v5M3 4l1 10h8l1-10"/></svg>
+          </button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+// ---- Dropdown helpers ----
+function buildSiteOptions(selected) {
+  const opts = allSites.map(s => `<option value="${esc(s.nome)}" ${s.nome === selected ? 'selected' : ''}>${esc(s.nome)}</option>`).join('');
+  return `<option value="">— Selecione —</option>` + opts;
+}
+
+function buildLocalOptions(selected) {
+  const opts = allLocais.map(l => `<option value="${esc(l.nome)}" ${l.nome === selected ? 'selected' : ''}>${esc(l.nome)}</option>`).join('');
+  return `<option value="">— Selecione —</option>` + opts;
+}
+
 // ---- Nova / Duplicar ----
 function openNovaDemanda(sourceId) {
   const src   = sourceId ? allDemandas.find(x => x.id === sourceId) : null;
@@ -208,9 +317,13 @@ function openNovaDemanda(sourceId) {
       Campos pré-preenchidos com base em <b>${src.id}</b>. Um novo ID será gerado ao registrar.</div>` : ''}
     <div class="form-row">
       <div class="form-group"><label class="form-label">Site *</label>
-        <input class="form-control" id="nd-site" value="${esc(src?.site||'')}" placeholder="Ex: ETE Norte" required></div>
+        <select class="form-control" id="nd-site" required>
+          ${buildSiteOptions(src?.site || '')}
+        </select></div>
       <div class="form-group"><label class="form-label">Local *</label>
-        <input class="form-control" id="nd-local" value="${esc(src?.local||'')}" placeholder="Ex: Blower A — Sala 01" required></div>
+        <select class="form-control" id="nd-local" required>
+          ${buildLocalOptions(src?.local || '')}
+        </select></div>
     </div>
     <div class="form-row">
       <div class="form-group"><label class="form-label">TAG do Equipamento *</label>
@@ -298,6 +411,126 @@ async function submitNovaDemanda() {
   } finally { mostrarLoading(false); }
 }
 
+// ---- Modal Site ----
+function openModalSite(id) {
+  const isEdit = !!id;
+  const s = isEdit ? allSites.find(x => x.id === id) : null;
+  editingSiteId = isEdit ? id : null;
+  document.getElementById('site-titulo').textContent = isEdit ? 'Editar Site' : 'Novo Site';
+  document.getElementById('site-body').innerHTML = `
+    <div class="form-group">
+      <label class="form-label">Nome do Site *</label>
+      <input class="form-control" id="site-nome" value="${esc(s?.nome||'')}" placeholder="Ex: ETE Norte" required>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Descrição</label>
+      <textarea class="form-control" id="site-descricao" rows="3" placeholder="Descrição opcional do site...">${esc(s?.descricao||'')}</textarea>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px">
+      <button type="button" class="btn btn-secondary" onclick="closeModal('modal-site')">Cancelar</button>
+      <button type="button" class="btn btn-primary" onclick="submitSite()">${isEdit ? 'Salvar Alterações' : 'Cadastrar Site'}</button>
+    </div>`;
+  openModal('modal-site');
+}
+
+async function submitSite() {
+  const nome = document.getElementById('site-nome').value.trim();
+  const descricao = document.getElementById('site-descricao').value.trim() || null;
+  if (!nome) { toast('Informe o nome do site.', 'error'); return; }
+
+  const site = {
+    id: editingSiteId || gerarIDSite(),
+    nome,
+    descricao
+  };
+
+  mostrarLoading(true);
+  try {
+    await dbSalvarSite(site);
+    closeModal('modal-site');
+    await loadSites();
+    toast(editingSiteId ? 'Site atualizado!' : 'Site cadastrado!', 'success');
+  } catch(e) {
+    toast('Erro ao salvar: ' + e.message, 'error');
+  } finally { mostrarLoading(false); }
+}
+
+async function excluirSite(id) {
+  if (!confirm('Excluir site? Esta ação é irreversível.')) return;
+  // Verificar se há demandas vinculadas
+  const vinculadas = allDemandas.filter(d => d.site === allSites.find(s => s.id === id)?.nome);
+  if (vinculadas.length > 0) {
+    if (!confirm(`Atenção: ${vinculadas.length} demanda(s) estão vinculadas a este site. Deseja excluir mesmo assim?`)) return;
+  }
+  mostrarLoading(true);
+  try {
+    await dbExcluirSite(id);
+    await loadSites();
+    toast('Site excluído.', 'info');
+  } catch(e) { toast('Erro: ' + e.message, 'error'); }
+  finally { mostrarLoading(false); }
+}
+
+// ---- Modal Local ----
+function openModalLocal(id) {
+  const isEdit = !!id;
+  const l = isEdit ? allLocais.find(x => x.id === id) : null;
+  editingLocalId = isEdit ? id : null;
+  document.getElementById('local-titulo').textContent = isEdit ? 'Editar Local' : 'Novo Local';
+  document.getElementById('local-body').innerHTML = `
+    <div class="form-group">
+      <label class="form-label">Nome do Local *</label>
+      <input class="form-control" id="local-nome" value="${esc(l?.nome||'')}" placeholder="Ex: Blower A — Sala 01" required>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Descrição</label>
+      <textarea class="form-control" id="local-descricao" rows="3" placeholder="Descrição opcional do local...">${esc(l?.descricao||'')}</textarea>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px">
+      <button type="button" class="btn btn-secondary" onclick="closeModal('modal-local')">Cancelar</button>
+      <button type="button" class="btn btn-primary" onclick="submitLocal()">${isEdit ? 'Salvar Alterações' : 'Cadastrar Local'}</button>
+    </div>`;
+  openModal('modal-local');
+}
+
+async function submitLocal() {
+  const nome = document.getElementById('local-nome').value.trim();
+  const descricao = document.getElementById('local-descricao').value.trim() || null;
+  if (!nome) { toast('Informe o nome do local.', 'error'); return; }
+
+  const local = {
+    id: editingLocalId || gerarIDLocal(),
+    nome,
+    descricao
+  };
+
+  mostrarLoading(true);
+  try {
+    await dbSalvarLocal(local);
+    closeModal('modal-local');
+    await loadLocais();
+    toast(editingLocalId ? 'Local atualizado!' : 'Local cadastrado!', 'success');
+  } catch(e) {
+    toast('Erro ao salvar: ' + e.message, 'error');
+  } finally { mostrarLoading(false); }
+}
+
+async function excluirLocal(id) {
+  if (!confirm('Excluir local? Esta ação é irreversível.')) return;
+  // Verificar se há demandas vinculadas
+  const vinculadas = allDemandas.filter(d => d.local === allLocais.find(l => l.id === id)?.nome);
+  if (vinculadas.length > 0) {
+    if (!confirm(`Atenção: ${vinculadas.length} demanda(s) estão vinculadas a este local. Deseja excluir mesmo assim?`)) return;
+  }
+  mostrarLoading(true);
+  try {
+    await dbExcluirLocal(id);
+    await loadLocais();
+    toast('Local excluído.', 'info');
+  } catch(e) { toast('Erro: ' + e.message, 'error'); }
+  finally { mostrarLoading(false); }
+}
+
 // ---- Detalhe ----
 function verDetalhe(id) {
   const d = allDemandas.find(x => x.id === id);
@@ -368,8 +601,14 @@ function openAceite(id, perfil) {
       <div style="background:var(--bg3);border-radius:var(--radius);padding:8px 14px;margin-bottom:16px;font-size:12px;color:var(--text2)">
         ID (não editável): <span style="font-family:var(--mono);color:var(--text);font-weight:600">${d.id}</span></div>
       <div class="form-row">
-        <div class="form-group"><label class="form-label">Site *</label><input class="form-control" id="ac-site" value="${esc(d.site||'')}" required></div>
-        <div class="form-group"><label class="form-label">Local *</label><input class="form-control" id="ac-local" value="${esc(d.local||'')}" required></div>
+        <div class="form-group"><label class="form-label">Site *</label>
+          <select class="form-control" id="ac-site" required>
+            ${buildSiteOptions(d.site || '')}
+          </select></div>
+        <div class="form-group"><label class="form-label">Local *</label>
+          <select class="form-control" id="ac-local" required>
+            ${buildLocalOptions(d.local || '')}
+          </select></div>
       </div>
       <div class="form-row">
         <div class="form-group"><label class="form-label">TAG *</label><input class="form-control" id="ac-tag" value="${esc(d.tag||'')}" required></div>
@@ -579,6 +818,12 @@ function showPage(name) {
       document.getElementById('logado-nome').textContent = currentUser.name + ' (' + currentUser.role + ')';
     }
   }
+  if (name === 'sites') {
+    loadSites();
+  }
+  if (name === 'locais') {
+    loadLocais();
+  }
 }
 
 function openModal(id)  { document.getElementById(id).classList.add('open'); }
@@ -672,7 +917,7 @@ function getMultiSelectValues(id) {
   const container = document.getElementById(id);
   const checkboxes = container.querySelectorAll('input[type="checkbox"]:checked');
   const values = Array.from(checkboxes).map(cb => cb.value);
-  
+
   // Atualiza label do trigger
   const label = container.querySelector('.multi-select-label');
   if (values.length === 0) {
@@ -682,7 +927,7 @@ function getMultiSelectValues(id) {
   } else {
     label.textContent = `${values.length} selecionados`;
   }
-  
+
   return values;
 }
 

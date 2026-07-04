@@ -4,7 +4,7 @@
 // ============================================================
 
 // ---- IndexedDB (cache offline) ----
-const IDB_NAME = 'spci_cache', IDB_VERSION = 1;
+const IDB_NAME = 'spci_cache', IDB_VERSION = 2;
 let idb;
 
 function openIDB() {
@@ -18,6 +18,10 @@ function openIDB() {
         d.createObjectStore('queue', { keyPath: 'qid', autoIncrement: true });
       if (!d.objectStoreNames.contains('config'))
         d.createObjectStore('config', { keyPath: 'key' });
+      if (!d.objectStoreNames.contains('sites'))
+        d.createObjectStore('sites', { keyPath: 'id' });
+      if (!d.objectStoreNames.contains('locais'))
+        d.createObjectStore('locais', { keyPath: 'id' });
     };
     req.onsuccess  = e => { idb = e.target.result; res(idb); };
     req.onerror    = () => rej(req.error);
@@ -155,6 +159,80 @@ async function dbExcluirDemanda(id) {
     await sbDelete('demandas', id);
   } else {
     await idbPut('queue', { action: 'delete', table: 'demandas', id, ts: Date.now() });
+    atualizarBadgeOffline();
+  }
+}
+
+// ---- SITES ----
+
+async function dbCarregarSites() {
+  if (!navigator.onLine) {
+    const cached = await idbAll('sites');
+    return cached;
+  }
+  try {
+    const rows = await sbSelect('sites', 'order=nome.asc');
+    for (const r of rows) await idbPut('sites', r);
+    return rows;
+  } catch (err) {
+    console.warn('Supabase offline, usando cache sites:', err);
+    return await idbAll('sites');
+  }
+}
+
+async function dbSalvarSite(site) {
+  await idbPut('sites', site);
+  if (navigator.onLine) {
+    await sbUpsert('sites', site);
+  } else {
+    await idbPut('queue', { action: 'upsert', table: 'sites', row: site, ts: Date.now() });
+    atualizarBadgeOffline();
+  }
+}
+
+async function dbExcluirSite(id) {
+  await idbDelete('sites', id);
+  if (navigator.onLine) {
+    await sbDelete('sites', id);
+  } else {
+    await idbPut('queue', { action: 'delete', table: 'sites', id, ts: Date.now() });
+    atualizarBadgeOffline();
+  }
+}
+
+// ---- LOCAIS ----
+
+async function dbCarregarLocais() {
+  if (!navigator.onLine) {
+    const cached = await idbAll('locais');
+    return cached;
+  }
+  try {
+    const rows = await sbSelect('locais', 'order=nome.asc');
+    for (const r of rows) await idbPut('locais', r);
+    return rows;
+  } catch (err) {
+    console.warn('Supabase offline, usando cache locais:', err);
+    return await idbAll('locais');
+  }
+}
+
+async function dbSalvarLocal(local) {
+  await idbPut('locais', local);
+  if (navigator.onLine) {
+    await sbUpsert('locais', local);
+  } else {
+    await idbPut('queue', { action: 'upsert', table: 'locais', row: local, ts: Date.now() });
+    atualizarBadgeOffline();
+  }
+}
+
+async function dbExcluirLocal(id) {
+  await idbDelete('locais', id);
+  if (navigator.onLine) {
+    await sbDelete('locais', id);
+  } else {
+    await idbPut('queue', { action: 'delete', table: 'locais', id, ts: Date.now() });
     atualizarBadgeOffline();
   }
 }

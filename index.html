@@ -26,6 +26,14 @@
       <svg class="icon" viewBox="0 0 16 16" fill="currentColor"><path d="M2 2h5v5H2zm7 0h5v5H9zm0 7h5v5H9zM2 9h5v5H2z"/></svg>
       <span>Demandas</span>
     </button>
+    <button class="nav-btn" onclick="showPage('sites')" id="nav-sites">
+      <svg class="icon" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1l7 4v6l-7 4-7-4V5l7-4z"/></svg>
+      <span>Sites</span>
+    </button>
+    <button class="nav-btn" onclick="showPage('locais')" id="nav-locais">
+      <svg class="icon" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C5 0 3 2 3 5c0 3 5 11 5 11s5-8 5-11c0-3-2-5-5-5zM8 7a2 2 0 100-4 2 2 0 000 4z"/></svg>
+      <span>Locais</span>
+    </button>
     <button class="nav-btn" onclick="showPage('login')" id="nav-login">
       <svg class="icon" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1a3 3 0 100 6A3 3 0 008 1zm0 8c-3.3 0-6 1.5-6 3v1h12v-1c0-1.5-2.7-3-6-3z"/></svg>
       <span id="user-nav-label">Entrar</span>
@@ -129,6 +137,62 @@
   </div>
 </div>
 
+<!-- PAGE SITES -->
+<div class="page" id="page-sites">
+  <div class="page-header">
+    <div>
+      <h1 style="font-size:20px;font-weight:600">Cadastro de Sites</h1>
+      <p style="color:var(--text2);font-size:13px;margin-top:2px">Gerencie os sites disponíveis para abertura de demandas</p>
+    </div>
+    <div class="page-header-actions">
+      <button class="btn btn-primary" onclick="openModalSite()">
+        <svg class="icon" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1v14M1 8h14"/></svg>
+        Novo Site
+      </button>
+    </div>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>ID</th><th>Nome do Site</th><th>Descrição</th><th>Ações</th></tr>
+      </thead>
+      <tbody id="sites-tbody"></tbody>
+    </table>
+  </div>
+  <div id="empty-sites" class="empty-state" style="display:none">
+    <svg width="48" height="48" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="6" y="6" width="36" height="36" rx="3"/><path d="M16 18h16M16 26h10"/></svg>
+    <p>Nenhum site cadastrado</p>
+  </div>
+</div>
+
+<!-- PAGE LOCAIS -->
+<div class="page" id="page-locais">
+  <div class="page-header">
+    <div>
+      <h1 style="font-size:20px;font-weight:600">Cadastro de Locais</h1>
+      <p style="color:var(--text2);font-size:13px;margin-top:2px">Gerencie os locais disponíveis para abertura de demandas</p>
+    </div>
+    <div class="page-header-actions">
+      <button class="btn btn-primary" onclick="openModalLocal()">
+        <svg class="icon" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1v14M1 8h14"/></svg>
+        Novo Local
+      </button>
+    </div>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>ID</th><th>Nome do Local</th><th>Descrição</th><th>Ações</th></tr>
+      </thead>
+      <tbody id="locais-tbody"></tbody>
+    </table>
+  </div>
+  <div id="empty-locais" class="empty-state" style="display:none">
+    <svg width="48" height="48" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="6" y="6" width="36" height="36" rx="3"/><path d="M16 18h16M16 26h10"/></svg>
+    <p>Nenhum local cadastrado</p>
+  </div>
+</div>
+
 <!-- PAGE LOGIN -->
 <div class="page" id="page-login">
   <div style="display:flex;justify-content:center">
@@ -229,6 +293,32 @@
       </button>
     </div>
     <div id="senha-content"></div>
+  </div>
+</div>
+
+<!-- MODAL SITE -->
+<div class="modal-overlay" id="modal-site">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-header">
+      <h2 class="modal-title" id="site-titulo">Novo Site</h2>
+      <button class="close-btn" onclick="closeModal('modal-site')">
+        <svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor"><path d="M2 2l12 12M14 2L2 14"/></svg>
+      </button>
+    </div>
+    <div id="site-body"></div>
+  </div>
+</div>
+
+<!-- MODAL LOCAL -->
+<div class="modal-overlay" id="modal-local">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-header">
+      <h2 class="modal-title" id="local-titulo">Novo Local</h2>
+      <button class="close-btn" onclick="closeModal('modal-local')">
+        <svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor"><path d="M2 2l12 12M14 2L2 14"/></svg>
+      </button>
+    </div>
+    <div id="local-body"></div>
   </div>
 </div>
 
