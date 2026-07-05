@@ -223,13 +223,13 @@ function renderDemandasTable() {
       <td class="td-mono">${d.id}</td>
       <td class="td-mono">${formatDate(d.data)}</td>
       <td>${esc(d.site)}</td>
-      <td style="max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${esc(d.local)}">${esc(d.local)}</td>
+      <td>${esc(d.local)}</td>
       <td class="td-mono">${esc(d.tag)}</td>
       <td>${situacaoBadge(d.situacao)}</td>
       <td>${statusBadge(st)}</td>
       <td>${prioBadge(d.prioridade)}</td>
       <td>${equipeBadge(d.equipe)}</td>
-      <td style="max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(d.solicitante)}</td>
+      <td>${esc(d.solicitante)}</td>
       <td onclick="event.stopPropagation()"><div style="display:flex;gap:4px">${acoes}</div></td>
     </tr>`;
   }).join('');
