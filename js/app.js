@@ -9,6 +9,8 @@ let allLocais        = [];
 let editingId        = null;
 let editingSiteId    = null;
 let editingLocalId   = null;
+let editingUserId    = null;
+let allUsuarios      = [];
 
 // ---- ID ----
 function gerarID() {
@@ -24,6 +26,11 @@ function gerarIDSite() {
 function gerarIDLocal() {
   const d = new Date();
   return 'LC-' + d.getFullYear() + String(d.getMonth() + 1).padStart(2, '0') + '-' + Math.floor(100 + Math.random() * 900);
+}
+
+function gerarIDUsuario() {
+  const d = new Date();
+  return 'USR-' + d.getFullYear() + String(d.getMonth() + 1).padStart(2, '0') + '-' + Math.floor(100 + Math.random() * 900);
 }
 
 // ---- Carregar ----
@@ -65,6 +72,19 @@ async function loadLocais() {
     mostrarLoading(false);
   }
   renderLocaisTable();
+}
+
+async function loadUsuarios() {
+  mostrarLoading(true);
+  try {
+    allUsuarios = await dbCarregarUsuarios();
+    allUsuarios.sort((a, b) => (a.nome || '').localeCompare(b.nome || ''));
+  } catch(e) {
+    toast('Erro ao carregar usuarios: ' + e.message, 'error');
+  } finally {
+    mostrarLoading(false);
+  }
+  renderUsuariosTable();
 }
 
 // ---- Filtros ----
@@ -152,6 +172,15 @@ function equipeBadge(e) {
   if (!e) return '<span style="color:var(--text3);font-size:12px">—</span>';
   return `<span class="badge ${map[e]||'badge-gray'} no-border" style="font-size:11px">${e}</span>`;
 }
+function tipoBadge(t) {
+  if (t === 'admin') return '<span class="badge badge-red">Admin</span>';
+  return '<span class="badge badge-blue">Normal</span>';
+}
+function roleBadge(r) {
+  const map = { 'admin':'badge-red', 'planejamento':'badge-purple', 'manutencao':'badge-orange' };
+  const labels = { 'admin':'Admin', 'planejamento':'Planejamento', 'manutencao':'Manutenção' };
+  return `<span class="badge ${map[r]||'badge-gray'}">${labels[r]||r}</span>`;
+}
 
 // ---- Tabela Demandas ----
 function renderDemandasTable() {
@@ -159,8 +188,8 @@ function renderDemandasTable() {
   const empty = document.getElementById('empty-demandas');
   if (!filteredDemandas.length) { tbody.innerHTML = ''; empty.style.display = 'block'; return; }
   empty.style.display = 'none';
-  const isPlan = currentUser?.role === 'planejamento';
-  const isMan  = currentUser?.role === 'manutencao';
+  const isPlan = isPlanejamento();
+  const isMan  = isManutencao();
 
   tbody.innerHTML = filteredDemandas.map(d => {
     const st       = d.status || 'Aberta';
@@ -270,6 +299,34 @@ function renderLocaisTable() {
   `).join('');
 }
 
+// ---- Tabela Usuários ----
+function renderUsuariosTable() {
+  const tbody = document.getElementById('usuarios-tbody');
+  const empty = document.getElementById('empty-usuarios');
+  if (!allUsuarios.length) { tbody.innerHTML = ''; empty.style.display = 'block'; return; }
+  empty.style.display = 'none';
+
+  tbody.innerHTML = allUsuarios.map(u => `
+    <tr>
+      <td class="td-mono">${esc(u.id)}</td>
+      <td><strong>${esc(u.nome)}</strong></td>
+      <td>${tipoBadge(u.tipo)}</td>
+      <td>${roleBadge(u.role)}</td>
+      <td style="font-family:var(--mono);font-size:12px;color:var(--text3)">••••••••</td>
+      <td>
+        <div style="display:flex;gap:4px">
+          <button class="btn btn-secondary btn-sm btn-icon" title="Editar" onclick="openModalUsuario('${u.id}')">
+            <svg class="icon" viewBox="0 0 16 16" fill="currentColor"><path d="M11.5 1l3 3L5 13.5 1.5 10 11.5 1z"/></svg>
+          </button>
+          <button class="btn btn-danger btn-sm btn-icon" title="Excluir" onclick="excluirUsuario('${u.id}')">
+            <svg class="icon" viewBox="0 0 16 16" fill="currentColor"><path d="M2 4h12M5 4V2h6v2M6 7v5M10 7v5M3 4l1 10h8l1-10"/></svg>
+          </button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
 // ---- Dropdown helpers ----
 function buildSiteOptions(selected) {
   const opts = allSites.map(s => `<option value="${esc(s.nome)}" ${s.nome === selected ? 'selected' : ''}>${esc(s.nome)}</option>`).join('');
@@ -287,8 +344,8 @@ function openNovaDemanda(sourceId) {
   const isDup = !!src;
   document.getElementById('nova-titulo').textContent = isDup ? 'Duplicar Demanda' : 'Nova Demanda de Manutenção';
   editingId = null;
-  const isPlan = currentUser?.role === 'planejamento';
-  const isMan  = currentUser?.role === 'manutencao';
+  const isPlan = isPlanejamento();
+  const isMan  = isManutencao();
 
   const secaoDir = (isPlan || isMan) ? `
     <hr class="section-sep">
@@ -388,7 +445,7 @@ async function submitNovaDemanda() {
   const prioEl     = document.getElementById('nd-prioridade');
   const equipe     = equipeEl ? equipeEl.value || null : null;
   const prioridade = prioEl   ? prioEl.value   || null : null;
-  const isMan      = currentUser?.role === 'manutencao';
+  const isMan      = isManutencao();
   const statusInicial = isMan ? 'Em Análise' : (equipe ? 'Em Análise' : 'Aberta');
 
   const d = {
@@ -527,6 +584,122 @@ async function excluirLocal(id) {
     await dbExcluirLocal(id);
     await loadLocais();
     toast('Local excluído.', 'info');
+  } catch(e) { toast('Erro: ' + e.message, 'error'); }
+  finally { mostrarLoading(false); }
+}
+
+// ---- Modal Usuário ----
+function openModalUsuario(id) {
+  const isEdit = !!id;
+  const u = isEdit ? allUsuarios.find(x => x.id === id) : null;
+  editingUserId = isEdit ? id : null;
+  document.getElementById('usuario-titulo').textContent = isEdit ? 'Editar Usuário' : 'Novo Usuário';
+
+  const tipoOptions = `
+    <option value="normal" ${u?.tipo==='normal'?'selected':''}>Normal</option>
+    <option value="admin" ${u?.tipo==='admin'?'selected':''}>Administrador</option>
+  `;
+
+  const roleOptions = `
+    <option value="admin" ${u?.role==='admin'?'selected':''}>Admin</option>
+    <option value="planejamento" ${u?.role==='planejamento'?'selected':''}>Planejamento</option>
+    <option value="manutencao" ${u?.role==='manutencao'?'selected':''}>Manutenção</option>
+  `;
+
+  document.getElementById('usuario-body').innerHTML = `
+    <div class="form-group">
+      <label class="form-label">Nome de Usuário *</label>
+      <input class="form-control" id="user-nome" value="${esc(u?.nome||'')}" placeholder="Ex: João Silva" required>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Tipo de Usuário *</label>
+        <select class="form-control" id="user-tipo" required>
+          ${tipoOptions}
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Função/Perfil *</label>
+        <select class="form-control" id="user-role" required>
+          ${roleOptions}
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Senha ${isEdit ? '(deixe em branco para manter a atual)' : '*'}</label>
+      <input type="password" class="form-control" id="user-senha" placeholder="${isEdit ? '••••••••' : 'Mínimo 6 caracteres'}" ${isEdit ? '' : 'required'}>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Confirmar Senha ${isEdit ? '(deixe em branco para manter a atual)' : '*'}</label>
+      <input type="password" class="form-control" id="user-senha-conf" placeholder="${isEdit ? '••••••••' : 'Repita a senha'}" ${isEdit ? '' : 'required'}>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px">
+      <button type="button" class="btn btn-secondary" onclick="closeModal('modal-usuario')">Cancelar</button>
+      <button type="button" class="btn btn-primary" onclick="submitUsuario()">${isEdit ? 'Salvar Alterações' : 'Cadastrar Usuário'}</button>
+    </div>`;
+  openModal('modal-usuario');
+}
+
+async function submitUsuario() {
+  const nome = document.getElementById('user-nome').value.trim();
+  const tipo = document.getElementById('user-tipo').value;
+  const role = document.getElementById('user-role').value;
+  const senha = document.getElementById('user-senha').value;
+  const senhaConf = document.getElementById('user-senha-conf').value;
+
+  if (!nome) { toast('Informe o nome do usuário.', 'error'); return; }
+  if (!tipo || !role) { toast('Selecione o tipo e a função do usuário.', 'error'); return; }
+
+  const isEdit = !!editingUserId;
+  const usuarioExistente = allUsuarios.find(u => u.nome.toLowerCase() === nome.toLowerCase() && u.id !== editingUserId);
+  if (usuarioExistente) { toast('Já existe um usuário com este nome.', 'error'); return; }
+
+  let senhaFinal;
+  if (isEdit) {
+    const u = allUsuarios.find(x => x.id === editingUserId);
+    if (!senha) {
+      senhaFinal = u.senha;
+    } else {
+      if (senha.length < 6) { toast('A senha deve ter no mínimo 6 caracteres.', 'error'); return; }
+      if (senha !== senhaConf) { toast('As senhas não conferem.', 'error'); return; }
+      senhaFinal = senha;
+    }
+  } else {
+    if (!senha) { toast('Informe a senha.', 'error'); return; }
+    if (senha.length < 6) { toast('A senha deve ter no mínimo 6 caracteres.', 'error'); return; }
+    if (senha !== senhaConf) { toast('As senhas não conferem.', 'error'); return; }
+    senhaFinal = senha;
+  }
+
+  const usuario = {
+    id: editingUserId || gerarIDUsuario(),
+    nome,
+    tipo,
+    role,
+    senha: senhaFinal,
+    dataCriacao: isEdit ? allUsuarios.find(u => u.id === editingUserId)?.dataCriacao : new Date().toISOString()
+  };
+
+  mostrarLoading(true);
+  try {
+    await dbSalvarUsuario(usuario);
+    closeModal('modal-usuario');
+    await loadUsuarios();
+    toast(isEdit ? 'Usuário atualizado!' : 'Usuário cadastrado!', 'success');
+  } catch(e) {
+    toast('Erro ao salvar: ' + e.message, 'error');
+  } finally { mostrarLoading(false); }
+}
+
+async function excluirUsuario(id) {
+  if (!confirm('Excluir usuário? Esta ação é irreversível.')) return;
+  if (id === currentUser?.id) { toast('Você não pode excluir seu próprio usuário.', 'error'); return; }
+
+  mostrarLoading(true);
+  try {
+    await dbExcluirUsuario(id);
+    await loadUsuarios();
+    toast('Usuário excluído.', 'info');
   } catch(e) { toast('Erro: ' + e.message, 'error'); }
   finally { mostrarLoading(false); }
 }
@@ -824,6 +997,9 @@ function showPage(name) {
   if (name === 'locais') {
     loadLocais();
   }
+  if (name === 'usuarios') {
+    loadUsuarios();
+  }
 }
 
 function openModal(id)  { document.getElementById(id).classList.add('open'); }
@@ -895,10 +1071,11 @@ function esc(s)           { if(!s) return ''; return String(s).replace(/&/g,'&am
 // ---- Init ----
 async function init() {
   await openIDB();
+  await seedUsuarios();
   await initAuth();
   await loadDemandas();
   await atualizarBadgeOffline();
-  renderLoginForm('planejamento');
+  renderLoginForm();
 }
 
 // ---- Filtro -----
