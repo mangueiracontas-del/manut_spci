@@ -1064,11 +1064,14 @@ async function init() {
     await seedUsuarios();
     await initAuth();
 
+    // SEMPRE carrega demandas, independente de login
+    await loadDemandas();
+
+    // Se não estiver logado, mostra login; senão, demandas
     if (!currentUser) {
       showPage('login');
     } else {
       showPage('demandas');
-      await loadDemandas();
     }
 
     await atualizarBadgeOffline();
