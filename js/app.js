@@ -1042,13 +1042,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const isOpen = btn.getAttribute('aria-expanded') === 'true';
     applyState(!isOpen);
   });
-
-  document.addEventListener('click', (ev) => {
-    if (btn.contains(ev.target)) return;
-    if (!card.classList.contains('collapsed') && !card.contains(ev.target)) {
-      applyState(false);
-    }
-  });
 });
 
 function toast(msg, type = 'info') {

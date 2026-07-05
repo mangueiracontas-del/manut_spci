@@ -368,7 +368,6 @@ tbody tr:hover td{background:var(--bg3);cursor:pointer}
   margin-bottom: 0 !important;
   padding-top: 0 !important;
   padding-bottom: 0 !important;
-  pointer-events: none;
 }
 
 /* RESPONSIVE */
