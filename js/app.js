@@ -998,6 +998,9 @@ function showPage(name) {
       document.getElementById('login-form-area').style.display = 'none';
       document.getElementById('logado-area').style.display     = 'block';
       document.getElementById('logado-nome').textContent = currentUser.nome + ' (' + currentUser.role + ')';
+    } else {
+      document.getElementById('login-form-area').style.display = 'block';
+      document.getElementById('logado-area').style.display     = 'none';
     }
   }
   if (name === 'sites') loadSites();
@@ -1070,21 +1073,18 @@ async function init() {
     await seedUsuarios();
     await initAuth();
 
-    // SEMPRE carrega demandas primeiro, independente de login
+    // SEMPRE carrega demandas primeiro — página principal
     await loadDemandas();
 
-    // Depois decide qual página mostrar
-    if (!currentUser) {
-      showPage('login');
-    } else {
-      showPage('demandas');
-    }
+    // SEMPRE mostra a página de demandas como principal
+    // Login só é acessado via clique no botão "Entrar"
+    showPage('demandas');
 
     await atualizarBadgeOffline();
   } catch (e) {
     console.error('Erro na inicialização:', e);
     toast('Erro ao inicializar o app. Verifique sua conexão.', 'error');
-    showPage('login');
+    showPage('demandas');
   }
 }
 
