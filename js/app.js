@@ -40,9 +40,7 @@ async function loadDemandas() {
     allDemandas = await dbCarregarDemandas();
     allDemandas.sort((a, b) => new Date(b.data) - new Date(a.data));
   } catch(e) {
-    console.error('Erro ao carregar demandas:', e);
-    toast('Erro ao carregar demandas. Verifique sua conexão com o Supabase.', 'error');
-    allDemandas = []; // garante que não fique undefined
+    toast('Erro ao carregar demandas: ' + e.message, 'error');
   } finally {
     mostrarLoading(false);
   }
@@ -341,19 +339,7 @@ function buildLocalOptions(selected) {
 }
 
 // ---- Nova / Duplicar ----
-async function openNovaDemanda(sourceId) {
-  // Garantir que sites e locais estejam carregados
-  if (!allSites.length) {
-    mostrarLoading(true);
-    try { allSites = await dbCarregarSites(); } catch(e) {}
-    mostrarLoading(false);
-  }
-  if (!allLocais.length) {
-    mostrarLoading(true);
-    try { allLocais = await dbCarregarLocais(); } catch(e) {}
-    mostrarLoading(false);
-  }
-
+function openNovaDemanda(sourceId) {
   const src   = sourceId ? allDemandas.find(x => x.id === sourceId) : null;
   const isDup = !!src;
   document.getElementById('nova-titulo').textContent = isDup ? 'Duplicar Demanda' : 'Nova Demanda de Manutenção';
@@ -775,19 +761,7 @@ function verDetalhe(id) {
 }
 
 // ---- Aceite Planejamento ----
-async function openAceite(id, perfil) {
-  // Garantir que sites e locais estejam carregados
-  if (!allSites.length) {
-    mostrarLoading(true);
-    try { allSites = await dbCarregarSites(); } catch(e) {}
-    mostrarLoading(false);
-  }
-  if (!allLocais.length) {
-    mostrarLoading(true);
-    try { allLocais = await dbCarregarLocais(); } catch(e) {}
-    mostrarLoading(false);
-  }
-
+function openAceite(id, perfil) {
   const d = allDemandas.find(x => x.id === id);
   if (!d) { toast('Demanda não encontrada', 'error'); return; }
   editingId = id;
@@ -1096,26 +1070,12 @@ function esc(s)           { if(!s) return ''; return String(s).replace(/&/g,'&am
 
 // ---- Init ----
 async function init() {
-  try {
-    await openIDB();
-    await seedUsuarios();
-    await initAuth();
-    
-    // Se não estiver logado, FORÇAR a página de login
-    if (!currentUser) {
-      showPage('login');
-    } else {
-      showPage('demandas');
-      await loadDemandas();
-    }
-    
-    await atualizarBadgeOffline();
-  } catch (e) {
-    console.error('Erro na inicialização:', e);
-    toast('Erro ao inicializar o app. Verifique sua conexão.', 'error');
-    // Mesmo com erro, mostrar login para não travar em tela branca
-    showPage('login');
-  }
+  await openIDB();
+  await seedUsuarios();
+  await initAuth();
+  await loadDemandas();
+  await atualizarBadgeOffline();
+  renderLoginForm();
 }
 
 // ---- Filtro -----
