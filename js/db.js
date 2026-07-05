@@ -4,7 +4,7 @@
 // ============================================================
 
 // ---- IndexedDB (cache offline) ----
-const IDB_NAME = 'spci_cache', IDB_VERSION = 3;
+const IDB_NAME = 'spci_cache', IDB_VERSION = 2;
 let idb;
 
 function openIDB() {
@@ -22,8 +22,6 @@ function openIDB() {
         d.createObjectStore('sites', { keyPath: 'id' });
       if (!d.objectStoreNames.contains('locais'))
         d.createObjectStore('locais', { keyPath: 'id' });
-      if (!d.objectStoreNames.contains('usuarios'))
-        d.createObjectStore('usuarios', { keyPath: 'id' });
     };
     req.onsuccess  = e => { idb = e.target.result; res(idb); };
     req.onerror    = () => rej(req.error);
@@ -48,10 +46,7 @@ async function sbSelect(table, params = '') {
   const r = await fetch(`${window.SUPABASE_URL}/rest/v1/${table}?${params}`, {
     headers: sbHeaders()
   });
-  if (!r.ok) {
-    const err = await r.text();
-    throw new Error(`Supabase SELECT erro ${r.status}: ${err}`);
-  }
+  if (!r.ok) throw new Error(`Supabase SELECT erro: ${r.status}`);
   return r.json();
 }
 
@@ -61,11 +56,7 @@ async function sbUpsert(table, row) {
     headers: { ...sbHeaders(), 'Prefer': 'resolution=merge-duplicates,return=representation' },
     body: JSON.stringify(row)
   });
-  if (!r.ok) {
-    const err = await r.text();
-    console.error('UPSERT erro:', r.status, err, 'Body:', JSON.stringify(row));
-    throw new Error(`Supabase UPSERT erro ${r.status}: ${err}`);
-  }
+  if (!r.ok) throw new Error(`Supabase UPSERT erro: ${r.status}`);
   return r.json();
 }
 
@@ -74,10 +65,7 @@ async function sbDelete(table, id) {
     method: 'DELETE',
     headers: sbHeaders()
   });
-  if (!r.ok) {
-    const err = await r.text();
-    throw new Error(`Supabase DELETE erro ${r.status}: ${err}`);
-  }
+  if (!r.ok) throw new Error(`Supabase DELETE erro: ${r.status}`);
 }
 
 // ---- Mapeamento de colunas (camelCase JS ↔ snake_case DB) ----
@@ -131,59 +119,21 @@ function fromDb(r) {
   };
 }
 
-// ---- Mapeamento de usuários ----
-function usuarioToDb(u) {
-  return {
-    id:           u.id,
-    nome:         u.nome,
-    tipo:         u.tipo,
-    role:         u.role,
-    senha:        u.senha,
-    data_criacao: u.dataCriacao || new Date().toISOString()
-  };
-}
-
-function usuarioFromDb(r) {
-  return {
-    id:         r.id,
-    nome:       r.nome,
-    tipo:       r.tipo,
-    role:       r.role,
-    senha:      r.senha,
-    dataCriacao: r.data_criacao
-  };
-}
-
 // ---- API pública usada pelo app ----
 
 /** Carrega todas as demandas. Online = Supabase; Offline = cache IDB */
 async function dbCarregarDemandas() {
-  // 1. Offline: sempre usa cache
   if (!navigator.onLine) {
     const cached = await idbAll('demandas');
-    console.log('[DB] Offline. Cache local:', cached.length, 'demandas');
     return cached.map(fromDb);
   }
-
-  // 2. Online: tenta Supabase
   try {
     const rows = await sbSelect('demandas', 'order=data.desc,data_hora.desc');
-    console.log('[DB] Supabase respondeu:', rows.length, 'demandas');
-
-    // Só sobrescreve o cache se o Supabase trouxe dados (evita apagar local por RLS/erro)
-    if (Array.isArray(rows) && rows.length > 0) {
-      for (const r of rows) await idbPut('demandas', r);
-      return rows.map(fromDb);
-    }
-
-    // Se veio vazio, usa cache local como fallback
-    console.warn('[DB] Supabase retornou vazio. Usando cache local...');
-    const cached = await idbAll('demandas');
-    return cached.map(fromDb);
-
+    // Atualiza cache local
+    for (const r of rows) await idbPut('demandas', r);
+    return rows.map(fromDb);
   } catch (err) {
-    console.error('[DB] Erro no Supabase:', err.message);
-    toast('Supabase indisponível. Usando dados locais.', 'info');
+    console.warn('Supabase offline, usando cache:', err);
     const cached = await idbAll('demandas');
     return cached.map(fromDb);
   }
@@ -192,6 +142,7 @@ async function dbCarregarDemandas() {
 /** Salva/atualiza uma demanda. Online = Supabase; Offline = enfileira */
 async function dbSalvarDemanda(demanda) {
   const row = toDb(demanda);
+  // Sempre salva no cache local
   await idbPut('demandas', row);
   if (navigator.onLine) {
     await sbUpsert('demandas', row);
@@ -284,50 +235,6 @@ async function dbExcluirLocal(id) {
     await idbPut('queue', { action: 'delete', table: 'locais', id, ts: Date.now() });
     atualizarBadgeOffline();
   }
-}
-
-// ---- USUÁRIOS ----
-
-async function dbCarregarUsuarios() {
-  if (!navigator.onLine) {
-    const cached = await idbAll('usuarios');
-    return cached.map(usuarioFromDb);
-  }
-  try {
-    const rows = await sbSelect('usuarios', 'order=nome.asc');
-    for (const r of rows) await idbPut('usuarios', r);
-    return rows.map(usuarioFromDb);
-  } catch (err) {
-    console.warn('Supabase offline, usando cache usuarios:', err);
-    const cached = await idbAll('usuarios');
-    return cached.map(usuarioFromDb);
-  }
-}
-
-async function dbSalvarUsuario(usuario) {
-  const row = usuarioToDb(usuario);
-  await idbPut('usuarios', row);
-  if (navigator.onLine) {
-    await sbUpsert('usuarios', row);
-  } else {
-    await idbPut('queue', { action: 'upsert', table: 'usuarios', row, ts: Date.now() });
-    atualizarBadgeOffline();
-  }
-}
-
-async function dbExcluirUsuario(id) {
-  await idbDelete('usuarios', id);
-  if (navigator.onLine) {
-    await sbDelete('usuarios', id);
-  } else {
-    await idbPut('queue', { action: 'delete', table: 'usuarios', id, ts: Date.now() });
-    atualizarBadgeOffline();
-  }
-}
-
-async function dbBuscarUsuarioPorNome(nome) {
-  const usuarios = await dbCarregarUsuarios();
-  return usuarios.find(u => u.nome.toLowerCase() === nome.toLowerCase()) || null;
 }
 
 /** Configuração (senhas) — somente IndexedDB local */

@@ -1,150 +1,109 @@
 // ============================================================
-// SANEAMENTO E SPCI — Autenticacao
+// SANEAMENTO E SPCI — Autenticação
 // ============================================================
 
 let currentUser = null;
+const DEFAULT_PASSWORDS = { planejamento: 'plan@2024', manutencao: 'manu@2024' };
 
 async function initAuth() {
   const saved = localStorage.getItem('spci_user');
-  if (saved) {
-    currentUser = JSON.parse(saved);
-  }
+  if (saved) currentUser = JSON.parse(saved);
   updateAuthUI();
 }
 
-// ---- Login por nome de usuario e senha ----
-async function login(nome, senha) {
-  const usuario = await dbBuscarUsuarioPorNome(nome);
-  if (!usuario) return false;
-  if (usuario.senha !== senha) return false;
+async function getPassword(role) {
+  const stored = await dbGetConfig('pwd_' + role);
+  return stored || DEFAULT_PASSWORDS[role];
+}
 
-  currentUser = {
-    id: usuario.id,
-    nome: usuario.nome,
-    role: usuario.role,
-    tipo: usuario.tipo
-  };
-  localStorage.setItem('spci_user', JSON.stringify(currentUser));
-  updateAuthUI();
-  return true;
+async function setPassword(role, pwd) {
+  await dbSetConfig('pwd_' + role, pwd);
+}
+
+async function login(role, pwd) {
+  const real = await getPassword(role);
+  if (pwd === real) {
+    currentUser = { role, name: role === 'planejamento' ? 'Planejamento' : 'Manutenção' };
+    localStorage.setItem('spci_user', JSON.stringify(currentUser));
+    updateAuthUI();
+    return true;
+  }
+  return false;
 }
 
 function fazerLogout() {
   currentUser = null;
   localStorage.removeItem('spci_user');
   updateAuthUI();
-  showPage('demandas');
-  toast('Sessao encerrada.', 'info');
+  renderLoginForm('planejamento');
+  toast('Sessão encerrada.', 'info');
 }
 
 function updateAuthUI() {
   const lbl = document.getElementById('user-nav-label');
-  if (currentUser) {
-    lbl.textContent = currentUser.nome;
-  } else {
-    lbl.textContent = 'Entrar';
-  }
+  if (currentUser) lbl.textContent = currentUser.name;
+  else lbl.textContent = 'Entrar';
 
   const logArea  = document.getElementById('logado-area');
   const formArea = document.getElementById('login-form-area');
-
   if (logArea) {
     if (currentUser) {
       logArea.style.display  = 'block';
-      if (formArea) formArea.style.display = 'none';
+      formArea.style.display = 'none';
       const nm = document.getElementById('logado-nome');
-      if (nm) nm.textContent = currentUser.nome + ' (' + currentUser.role + ')';
+      if (nm) nm.textContent = currentUser.name + ' (' + currentUser.role + ')';
     } else {
       logArea.style.display  = 'none';
-      if (formArea) {
-        formArea.style.display = 'block';
-        renderLoginForm('login');
-      }
+      formArea.style.display = 'block';
     }
   }
-
-  updateNavVisibility();
   renderDemandasTable();
 }
 
-function updateNavVisibility() {
-  const navSites = document.getElementById('nav-sites');
-  const navLocais = document.getElementById('nav-locais');
-  const navUsuarios = document.getElementById('nav-usuarios');
-
-  const isAdmin = currentUser && currentUser.tipo === 'admin';
-
-  if (navSites) navSites.style.display = isAdmin ? 'flex' : 'none';
-  if (navLocais) navLocais.style.display = isAdmin ? 'flex' : 'none';
-  if (navUsuarios) navUsuarios.style.display = isAdmin ? 'flex' : 'none';
-}
-
-function isAdmin() {
-  return currentUser && currentUser.tipo === 'admin';
-}
-
-function isPlanejamento() {
-  return currentUser && (currentUser.role === 'planejamento' || currentUser.tipo === 'admin');
-}
-
-function isManutencao() {
-  return currentUser && (currentUser.role === 'manutencao' || currentUser.tipo === 'admin');
-}
-
 // ---- UI de login ----
-function renderLoginForm(tab) {
-  loginTabAtivo = tab || 'login';
-  const formArea = document.getElementById('login-form-area');
-  if (!formArea) return;
+let loginTabAtivo = 'planejamento';
 
-  formArea.innerHTML = `
+function switchLoginTab(role) {
+  loginTabAtivo = role;
+  document.getElementById('tab-plan').classList.toggle('active', role === 'planejamento');
+  document.getElementById('tab-man').classList.toggle('active', role === 'manutencao');
+  renderLoginForm(role);
+}
+
+function renderLoginForm(role) {
+  if (currentUser) return;
+  document.getElementById('login-form-area').innerHTML = `
     <div class="form-group">
-      <label class="form-label">Nome de Usuario</label>
-      <input type="text" class="form-control" id="login-nome" placeholder="Digite seu nome de usuario"
-             onkeydown="if(event.key==='Enter')doLogin()">
-    </div>
-    <div class="form-group">
-      <label class="form-label">Senha</label>
-      <input type="password" class="form-control" id="login-senha" placeholder="Digite sua senha"
+      <label class="form-label">${role === 'planejamento' ? 'Equipe de Planejamento' : 'Equipe de Manutenção'}</label>
+      <input type="password" class="form-control" id="login-pwd" placeholder="Senha de acesso"
              onkeydown="if(event.key==='Enter')doLogin()">
     </div>
     <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="doLogin()">
-      Entrar
+      Entrar como ${role === 'planejamento' ? 'Planejamento' : 'Manutenção'}
     </button>`;
 }
 
 async function doLogin() {
-  const nome = document.getElementById('login-nome').value.trim();
-  const senha = document.getElementById('login-senha').value;
-
-  if (!nome || !senha) { 
-    toast('Preencha nome de usuario e senha.', 'error'); 
-    return; 
-  }
-
-  const ok = await login(nome, senha);
+  const pwd = document.getElementById('login-pwd').value;
+  if (!pwd) { toast('Informe a senha', 'error'); return; }
+  const ok = await login(loginTabAtivo, pwd);
   if (ok) {
-    toast('Bem-vindo, ' + currentUser.nome + '!', 'success');
+    toast('Bem-vindo, ' + currentUser.name + '!', 'success');
     document.getElementById('login-form-area').style.display = 'none';
     document.getElementById('logado-area').style.display     = 'block';
-    document.getElementById('logado-nome').textContent = currentUser.nome + ' (' + currentUser.role + ')';
-    showPage('demandas');
+    document.getElementById('logado-nome').textContent = currentUser.name + ' (' + currentUser.role + ')';
   } else {
-    toast('Nome de usuario ou senha incorretos.', 'error');
-    document.getElementById('login-senha').value = '';
+    toast('Senha incorreta.', 'error');
+    document.getElementById('login-pwd').value = '';
   }
 }
 
-// ---- Alterar senha do usuario logado ----
 function openChangePassword() {
   document.getElementById('senha-content').innerHTML = `
-    <div style="background:var(--bg3);border-radius:var(--radius);padding:8px 14px;margin-bottom:16px;font-size:12px;color:var(--text2)">
-      Usuario: <span style="font-family:var(--mono);color:var(--text);font-weight:600">${esc(currentUser.nome)}</span>
-    </div>
     <div class="form-group"><label class="form-label">Senha Atual</label>
       <input type="password" class="form-control" id="cp-atual"></div>
     <div class="form-group"><label class="form-label">Nova Senha</label>
-      <input type="password" class="form-control" id="cp-nova" placeholder="Minimo 6 caracteres"></div>
+      <input type="password" class="form-control" id="cp-nova" placeholder="Mínimo 6 caracteres"></div>
     <div class="form-group"><label class="form-label">Confirmar Nova Senha</label>
       <input type="password" class="form-control" id="cp-conf"></div>
     <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
@@ -158,49 +117,12 @@ async function salvarSenha() {
   const atual = document.getElementById('cp-atual').value;
   const nova  = document.getElementById('cp-nova').value;
   const conf  = document.getElementById('cp-conf').value;
-
-  if (!atual || !nova || !conf) { 
-    toast('Preencha todos os campos', 'error'); 
-    return; 
-  }
-  if (nova.length < 6) { 
-    toast('Minimo 6 caracteres', 'error'); 
-    return; 
-  }
-  if (nova !== conf) { 
-    toast('As senhas nao conferem', 'error'); 
-    return; 
-  }
-
-  const usuarios = await dbCarregarUsuarios();
-  const usuario = usuarios.find(u => u.id === currentUser.id);
-
-  if (!usuario || atual !== usuario.senha) { 
-    toast('Senha atual incorreta', 'error'); 
-    return; 
-  }
-
-  usuario.senha = nova;
-  await dbSalvarUsuario(usuario);
-
+  if (!atual || !nova || !conf) { toast('Preencha todos os campos', 'error'); return; }
+  if (nova.length < 6) { toast('Mínimo 6 caracteres', 'error'); return; }
+  if (nova !== conf)   { toast('As senhas não conferem', 'error'); return; }
+  const real = await getPassword(currentUser.role);
+  if (atual !== real)  { toast('Senha atual incorreta', 'error'); return; }
+  await setPassword(currentUser.role, nova);
   closeModal('modal-senha');
-  toast('Senha alterada com sucesso!', 'success');
-}
-
-// ---- Seed de usuarios padrao ----
-async function seedUsuarios() {
-  const usuarios = await dbCarregarUsuarios();
-
-  if (usuarios.length === 0) {
-    const defaultUsers = [
-      { id: 'USR-' + Date.now() + '-1', nome: 'Anderson', senha: '986532', role: 'admin', tipo: 'admin', dataCriacao: new Date().toISOString() },
-      { id: 'USR-' + Date.now() + '-2', nome: 'Planejador', senha: 'plan@2024', role: 'planejamento', tipo: 'normal', dataCriacao: new Date().toISOString() },
-      { id: 'USR-' + Date.now() + '-3', nome: 'Manutencao', senha: 'manu@2024', role: 'manutencao', tipo: 'normal', dataCriacao: new Date().toISOString() }
-    ];
-
-    for (const user of defaultUsers) {
-      await dbSalvarUsuario(user);
-    }
-    console.log('Usuarios padrao criados com sucesso!');
-  }
+  toast('Senha alterada!', 'success');
 }

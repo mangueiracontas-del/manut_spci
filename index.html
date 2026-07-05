@@ -26,17 +26,13 @@
       <svg class="icon" viewBox="0 0 16 16" fill="currentColor"><path d="M2 2h5v5H2zm7 0h5v5H9zm0 7h5v5H9zM2 9h5v5H2z"/></svg>
       <span>Demandas</span>
     </button>
-    <button class="nav-btn" onclick="showPage('sites')" id="nav-sites" style="display:none">
+    <button class="nav-btn" onclick="showPage('sites')" id="nav-sites">
       <svg class="icon" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1l7 4v6l-7 4-7-4V5l7-4z"/></svg>
       <span>Sites</span>
     </button>
-    <button class="nav-btn" onclick="showPage('locais')" id="nav-locais" style="display:none">
+    <button class="nav-btn" onclick="showPage('locais')" id="nav-locais">
       <svg class="icon" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C5 0 3 2 3 5c0 3 5 11 5 11s5-8 5-11c0-3-2-5-5-5zM8 7a2 2 0 100-4 2 2 0 000 4z"/></svg>
       <span>Locais</span>
-    </button>
-    <button class="nav-btn" onclick="showPage('usuarios')" id="nav-usuarios" style="display:none">
-      <svg class="icon" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1a3 3 0 100 6A3 3 0 008 1zm0 8c-3.3 0-6 1.5-6 3v1h12v-1c0-1.5-2.7-3-6-3z"/></svg>
-      <span>Usuários</span>
     </button>
     <button class="nav-btn" onclick="showPage('login')" id="nav-login">
       <svg class="icon" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1a3 3 0 100 6A3 3 0 008 1zm0 8c-3.3 0-6 1.5-6 3v1h12v-1c0-1.5-2.7-3-6-3z"/></svg>
@@ -197,34 +193,6 @@
   </div>
 </div>
 
-<!-- PAGE USUÁRIOS -->
-<div class="page" id="page-usuarios">
-  <div class="page-header">
-    <div>
-      <h1 style="font-size:20px;font-weight:600">Cadastro de Usuários</h1>
-      <p style="color:var(--text2);font-size:13px;margin-top:2px">Gerencie os usuários do sistema</p>
-    </div>
-    <div class="page-header-actions">
-      <button class="btn btn-primary" onclick="openModalUsuario()">
-        <svg class="icon" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1v14M1 8h14"/></svg>
-        Novo Usuário
-      </button>
-    </div>
-  </div>
-  <div class="table-wrap">
-    <table>
-      <thead>
-        <tr><th>ID</th><th>Nome</th><th>Tipo</th><th>Função</th><th>Senha</th><th>Ações</th></tr>
-      </thead>
-      <tbody id="usuarios-tbody"></tbody>
-    </table>
-  </div>
-  <div id="empty-usuarios" class="empty-state" style="display:none">
-    <svg width="48" height="48" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="6" y="6" width="36" height="36" rx="3"/><path d="M16 18h16M16 26h10"/></svg>
-    <p>Nenhum usuário cadastrado</p>
-  </div>
-</div>
-
 <!-- PAGE LOGIN -->
 <div class="page" id="page-login">
   <div style="display:flex;justify-content:center">
@@ -237,6 +205,10 @@
           </svg>
           <h2 style="font-size:17px;font-weight:600">Acesso Profissional</h2>
           <p style="font-size:13px;color:var(--text2);margin-top:4px">Planejamento e Manutenção</p>
+        </div>
+        <div class="login-tabs">
+          <button class="login-tab active" id="tab-plan" onclick="switchLoginTab('planejamento')">Planejamento</button>
+          <button class="login-tab" id="tab-man" onclick="switchLoginTab('manutencao')">Manutenção</button>
         </div>
         <div id="login-form-area"></div>
         <div id="logado-area" style="display:none">
@@ -347,19 +319,6 @@
       </button>
     </div>
     <div id="local-body"></div>
-  </div>
-</div>
-
-<!-- MODAL USUÁRIO -->
-<div class="modal-overlay" id="modal-usuario">
-  <div class="modal" style="max-width:480px">
-    <div class="modal-header">
-      <h2 class="modal-title" id="usuario-titulo">Novo Usuário</h2>
-      <button class="close-btn" onclick="closeModal('modal-usuario')">
-        <svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor"><path d="M2 2l12 12M14 2L2 14"/></svg>
-      </button>
-    </div>
-    <div id="usuario-body"></div>
   </div>
 </div>
 
