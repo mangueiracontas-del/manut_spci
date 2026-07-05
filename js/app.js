@@ -930,14 +930,7 @@ function openAnalise(id) {
   openModal('modal-analise');
 }
 
-async function salvarAnalise() {
-  const d = allDemandas.find(x => x.id === editingId);
-  d.om       = document.getElementById('al-om').value.trim()       || null;
-  d.tecnico  = document.getElementById('al-tecnico').value.trim()   || null;
-  d.analise  = document.getElementById('al-analise').value.trim()   || null;
-  d.resolucao= document.getElementById('al-resolucao').value.trim() || null;
-  d.status   = document.getElementById('al-status').value;
-  if (d.status === 'Concluída') d.dataConclusao = new Date().toISOString().split('T')[0];
+.dataConclusao = new Date().toISOString().split('T')[0];
   mostrarLoading(true);
   try {
     await dbSalvarDemanda(d);
@@ -994,7 +987,7 @@ function showPage(name) {
   document.getElementById('page-' + name).classList.add('active');
   document.getElementById('nav-' + name).classList.add('active');
   if (name === 'login') {
-    renderLoginForm(loginTabAtivo || 'login');  // <-- CORREÇÃO: fallback seguro
+    renderLoginForm(window.loginTabAtivo || 'login');
     if (currentUser) {
       document.getElementById('login-form-area').style.display = 'none';
       document.getElementById('logado-area').style.display     = 'block';
