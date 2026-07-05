@@ -1,5 +1,5 @@
 // ============================================================
-// SANEAMENTO E SPCI — Autenticação
+// SANEAMENTO E SPCI — Autenticacao
 // ============================================================
 
 let currentUser = null;
@@ -12,7 +12,7 @@ async function initAuth() {
   updateAuthUI();
 }
 
-// ---- Login por nome de usuário e senha ----
+// ---- Login por nome de usuario e senha ----
 async function login(nome, senha) {
   const usuario = await dbBuscarUsuarioPorNome(nome);
   if (!usuario) return false;
@@ -33,8 +33,8 @@ function fazerLogout() {
   currentUser = null;
   localStorage.removeItem('spci_user');
   updateAuthUI();
-  showPage('login');
-  toast('Sessão encerrada.', 'info');
+  showPage('demandas');
+  toast('Sessao encerrada.', 'info');
 }
 
 function updateAuthUI() {
@@ -58,7 +58,7 @@ function updateAuthUI() {
       logArea.style.display  = 'none';
       if (formArea) {
         formArea.style.display = 'block';
-        renderLoginForm('login'); // <-- CORREÇÃO: garantir parâmetro
+        renderLoginForm('login');
       }
     }
   }
@@ -93,14 +93,14 @@ function isManutencao() {
 
 // ---- UI de login ----
 function renderLoginForm(tab) {
-  loginTabAtivo = tab || 'login';  // <-- CORREÇÃO: garantir valor padrão
+  loginTabAtivo = tab || 'login';
   const formArea = document.getElementById('login-form-area');
   if (!formArea) return;
 
   formArea.innerHTML = `
     <div class="form-group">
-      <label class="form-label">Nome de Usuário</label>
-      <input type="text" class="form-control" id="login-nome" placeholder="Digite seu nome de usuário"
+      <label class="form-label">Nome de Usuario</label>
+      <input type="text" class="form-control" id="login-nome" placeholder="Digite seu nome de usuario"
              onkeydown="if(event.key==='Enter')doLogin()">
     </div>
     <div class="form-group">
@@ -118,7 +118,7 @@ async function doLogin() {
   const senha = document.getElementById('login-senha').value;
 
   if (!nome || !senha) { 
-    toast('Preencha nome de usuário e senha.', 'error'); 
+    toast('Preencha nome de usuario e senha.', 'error'); 
     return; 
   }
 
@@ -126,25 +126,25 @@ async function doLogin() {
   if (ok) {
     toast('Bem-vindo, ' + currentUser.nome + '!', 'success');
     document.getElementById('login-form-area').style.display = 'none';
-    document.getElementById('logado-area').style.display = 'block';
+    document.getElementById('logado-area').style.display     = 'block';
     document.getElementById('logado-nome').textContent = currentUser.nome + ' (' + currentUser.role + ')';
     showPage('demandas');
   } else {
-    toast('Nome de usuário ou senha incorretos.', 'error');
+    toast('Nome de usuario ou senha incorretos.', 'error');
     document.getElementById('login-senha').value = '';
   }
 }
 
-// ---- Alterar senha do usuário logado ----
+// ---- Alterar senha do usuario logado ----
 function openChangePassword() {
   document.getElementById('senha-content').innerHTML = `
     <div style="background:var(--bg3);border-radius:var(--radius);padding:8px 14px;margin-bottom:16px;font-size:12px;color:var(--text2)">
-      Usuário: <span style="font-family:var(--mono);color:var(--text);font-weight:600">${esc(currentUser.nome)}</span>
+      Usuario: <span style="font-family:var(--mono);color:var(--text);font-weight:600">${esc(currentUser.nome)}</span>
     </div>
     <div class="form-group"><label class="form-label">Senha Atual</label>
       <input type="password" class="form-control" id="cp-atual"></div>
     <div class="form-group"><label class="form-label">Nova Senha</label>
-      <input type="password" class="form-control" id="cp-nova" placeholder="Mínimo 6 caracteres"></div>
+      <input type="password" class="form-control" id="cp-nova" placeholder="Minimo 6 caracteres"></div>
     <div class="form-group"><label class="form-label">Confirmar Nova Senha</label>
       <input type="password" class="form-control" id="cp-conf"></div>
     <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
@@ -164,11 +164,11 @@ async function salvarSenha() {
     return; 
   }
   if (nova.length < 6) { 
-    toast('Mínimo 6 caracteres', 'error'); 
+    toast('Minimo 6 caracteres', 'error'); 
     return; 
   }
   if (nova !== conf) { 
-    toast('As senhas não conferem', 'error'); 
+    toast('As senhas nao conferem', 'error'); 
     return; 
   }
 
@@ -187,7 +187,7 @@ async function salvarSenha() {
   toast('Senha alterada com sucesso!', 'success');
 }
 
-// ---- Seed de usuários padrão ----
+// ---- Seed de usuarios padrao ----
 async function seedUsuarios() {
   const usuarios = await dbCarregarUsuarios();
 
@@ -201,6 +201,6 @@ async function seedUsuarios() {
     for (const user of defaultUsers) {
       await dbSalvarUsuario(user);
     }
-    console.log('Usuários padrão criados com sucesso!');
+    console.log('Usuarios padrao criados com sucesso!');
   }
 }
