@@ -230,6 +230,7 @@ function renderDemandasTable() {
       <td>${prioBadge(d.prioridade)}</td>
       <td>${equipeBadge(d.equipe)}</td>
       <td style="max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(d.solicitante)}</td>
+      <td class="td-mono" style="color:var(--text2);white-space:nowrap">${calcularTempoVida(d)}</td>
       <td onclick="event.stopPropagation()"><div style="display:flex;gap:4px">${acoes}</div></td>
     </tr>`;
   }).join('');
@@ -964,12 +965,12 @@ async function excluirDemanda(id) {
 function exportExcel() {
   if (!filteredDemandas.length) { toast('Nenhuma demanda para exportar.','error'); return; }
   const rows = [
-    ['ID','Data','Site','Local','TAG','Situação','Status','Prioridade','Equipe','Solicitante','Descrição','Nº OM','Análise','Resolução','Técnico','Data Conclusão','Comentário Planejamento'],
-    ...filteredDemandas.map(d => [d.id,d.data,d.site,d.local,d.tag,d.situacao,d.status||'Aberta',d.prioridade||'',d.equipe||'',d.solicitante,d.descricao,d.om||'',d.analise||'',d.resolucao||'',d.tecnico||'',d.dataConclusao||'',d.comentarioPlan||''])
+    ['ID','Data','Site','Local','TAG','Situação','Status','Prioridade','Equipe','Solicitante','Tempo Vida (dias)','Descrição','Nº OM','Análise','Resolução','Técnico','Data Conclusão','Comentário Planejamento'],
+    ...filteredDemandas.map(d => [d.id,d.data,d.site,d.local,d.tag,d.situacao,d.status||'Aberta',d.prioridade||'',d.equipe||'',d.solicitante,calcularTempoVida(d).replace(' dias','').replace('< ','').replace(' dia',''),d.descricao,d.om||'',d.analise||'',d.resolucao||'',d.tecnico||'',d.dataConclusao||'',d.comentarioPlan||''])
   ];
   const wb = XLSX.utils.book_new();
   const ws = XLSX.utils.aoa_to_sheet(rows);
-  ws['!cols'] = [{wch:16},{wch:12},{wch:18},{wch:22},{wch:14},{wch:36},{wch:14},{wch:10},{wch:22},{wch:22},{wch:60},{wch:16},{wch:40},{wch:40},{wch:22},{wch:14},{wch:50}];
+  ws['!cols'] = [{wch:16},{wch:12},{wch:18},{wch:22},{wch:14},{wch:36},{wch:14},{wch:10},{wch:22},{wch:22},{wch:16},{wch:60},{wch:16},{wch:40},{wch:40},{wch:22},{wch:14},{wch:50}];
   XLSX.utils.book_append_sheet(wb, ws, 'Demandas');
   XLSX.writeFile(wb, 'SPCI_Demandas_' + new Date().toISOString().split('T')[0] + '.xlsx');
   toast('Excel exportado!','success');
@@ -1068,6 +1069,22 @@ function toast(msg, type = 'info') {
 
 function formatDate(d)    { if(!d) return '—'; const[y,m,dd]=d.split('-'); return `${dd}/${m}/${y}`; }
 function formatDateTime(dt){ if(!dt) return '—'; const d=new Date(dt); return d.toLocaleDateString('pt-BR')+' '+d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}); }
+function calcularTempoVida(d) {
+  const dataCadastro = d.data ? new Date(d.data + 'T00:00:00') : null;
+  if (!dataCadastro) return '—';
+  const hoje = new Date();
+  hoje.setHours(0,0,0,0);
+  const dataFim = (d.status === 'Concluída' && d.dataConclusao)
+    ? new Date(d.dataConclusao + 'T00:00:00')
+    : hoje;
+  const diffMs = dataFim - dataCadastro;
+  const diffDias = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+  if (diffDias < 0) return '0 dias';
+  if (diffDias === 0) return '< 1 dia';
+  if (diffDias === 1) return '1 dia';
+  return diffDias + ' dias';
+}
+
 function esc(s)           { if(!s) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
 // ---- Init ----
