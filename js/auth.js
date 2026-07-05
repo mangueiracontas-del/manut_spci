@@ -56,7 +56,10 @@ function updateAuthUI() {
       if (nm) nm.textContent = currentUser.nome + ' (' + currentUser.role + ')';
     } else {
       logArea.style.display  = 'none';
-      if (formArea) formArea.style.display = 'block';
+      if (formArea) {
+        formArea.style.display = 'block';
+        renderLoginForm(); // Re-renderiza o form caso tenha sido limpo
+      }
     }
   }
 
