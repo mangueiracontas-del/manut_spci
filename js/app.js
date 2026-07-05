@@ -749,6 +749,7 @@ function verDetalhe(id) {
       ${d.dataConclusao?`<div class="detail-field"><label>Conclusão</label><span>${formatDate(d.dataConclusao)}</span></div>`:''}
     </div>`:''}
     <div style="display:flex;gap:8px;margin-top:20px;justify-content:flex-end;flex-wrap:wrap">
+      <button class="btn btn-secondary btn-sm" onclick="closeModal('modal-detalhe')">Cancelar</button>
       <button class="btn btn-secondary btn-sm" onclick="closeModal('modal-detalhe');openNovaDemanda('${d.id}')">
         <svg class="icon" viewBox="0 0 16 16" fill="currentColor"><path d="M5 1h7l3 3v9H5V1zm2 0v3h6M1 5h4v10h8"/></svg> Duplicar
       </button>
@@ -1012,11 +1013,12 @@ function openModal(id)  { document.getElementById(id).classList.add('open'); }
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 
 document.addEventListener('DOMContentLoaded', () => {
-  document.querySelectorAll('.modal-overlay').forEach(m => {
-    m.addEventListener('click', e => { 
-      if (e.target === m) closeModal(m.id); 
+  const modaisSemFecharNoOverlay = ['modal-nova', 'modal-site', 'modal-local', 'modal-aceite', 'modal-analise', 'modal-detalhe', 'modal-senha', 'modal-usuario'];
+    document.querySelectorAll('.modal-overlay').forEach(m => {
+      m.addEventListener('click', e => { 
+        if (e.target === m && !modaisSemFecharNoOverlay.includes(m.id)) closeModal(m.id); 
+      });
     });
-  });
 
   const btn = document.getElementById('btn-toggle-filtros');
   const card = document.getElementById('filtros-card');
@@ -1046,12 +1048,14 @@ document.addEventListener('DOMContentLoaded', () => {
     applyState(!isOpen);
   });
 
+  /*
   document.addEventListener('click', (ev) => {
     if (btn.contains(ev.target)) return;
     if (!card.classList.contains('collapsed') && !card.contains(ev.target)) {
       applyState(false);
     }
   });
+  */
 });
 
 function toast(msg, type = 'info') {
