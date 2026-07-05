@@ -901,15 +901,14 @@ async function confirmarAceite(perfil) {
   finally { mostrarLoading(false); }
 }
 
-// ---- Análise ----
-function openAnalise(id) {
+
+async function openAnalise(id) {
   const d = allDemandas.find(x => x.id === id);
   if (!d) return;
   editingId = id;
   document.getElementById('analise-content').innerHTML = `
-    <p style="color:var(--text2);font-size:13px;margin-bottom:16px">${d.id} — <span style="font-family:var(--mono)">${esc(d.tag)}</span> — ${esc(d.local)}</p>
     <div class="form-row">
-      <div class="form-group"><label class="form-label">Número da OM</label>
+      <div class="form-group"><label class="form-label">Nº OM</label>
         <input class="form-control" id="al-om" value="${esc(d.om||'')}" placeholder="Ex: OM-2025-0042" style="font-family:var(--mono)"></div>
       <div class="form-group"><label class="form-label">Técnico Responsável</label>
         <input class="form-control" id="al-tecnico" value="${esc(d.tecnico||'')}" placeholder="Nome"></div>
@@ -930,7 +929,14 @@ function openAnalise(id) {
   openModal('modal-analise');
 }
 
-.dataConclusao = new Date().toISOString().split('T')[0];
+async function salvarAnalise() {
+  const d = allDemandas.find(x => x.id === editingId);
+  d.om       = document.getElementById('al-om').value.trim()       || null;
+  d.tecnico  = document.getElementById('al-tecnico').value.trim()   || null;
+  d.analise  = document.getElementById('al-analise').value.trim()   || null;
+  d.resolucao= document.getElementById('al-resolucao').value.trim() || null;
+  d.status   = document.getElementById('al-status').value;
+  if (d.status === 'Concluída') d.dataConclusao = new Date().toISOString().split('T')[0];
   mostrarLoading(true);
   try {
     await dbSalvarDemanda(d);
@@ -1064,10 +1070,10 @@ async function init() {
     await seedUsuarios();
     await initAuth();
 
-    // SEMPRE carrega demandas, independente de login
+    // SEMPRE carrega demandas primeiro, independente de login
     await loadDemandas();
 
-    // Se não estiver logado, mostra login; senão, demandas
+    // Depois decide qual página mostrar
     if (!currentUser) {
       showPage('login');
     } else {
