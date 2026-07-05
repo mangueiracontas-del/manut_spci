@@ -57,8 +57,6 @@ main{flex:1;padding:24px;max-width:1440px;width:100%;margin:0 auto}
 .badge-blue{background:var(--blue-bg);color:var(--blue)}
 .badge-purple{background:var(--purple-bg);color:var(--purple)}
 .badge-gray{background:var(--bg4);color:var(--text2)}
-.badge::before{content:'';width:6px;height:6px;border-radius:50%;background:currentColor;flex-shrink:0}
-
 /* Badge sem borda/contorno (para Situação e Equipe na tabela) */
 .badge.no-border {
   background: transparent !important;
