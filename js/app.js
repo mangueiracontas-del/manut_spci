@@ -11,6 +11,7 @@ let editingSiteId    = null;
 let editingLocalId   = null;
 let editingUserId    = null;
 let allUsuarios      = [];
+let loginTabAtivo    = 'login';  // <-- CORREÇÃO: variável declarada
 
 // ---- ID ----
 function gerarID() {
@@ -39,10 +40,11 @@ async function loadDemandas() {
   try {
     allDemandas = await dbCarregarDemandas();
     allDemandas.sort((a, b) => new Date(b.data) - new Date(a.data));
+    console.log('[APP] Demandas carregadas:', allDemandas.length);
   } catch(e) {
-    console.error('Erro ao carregar demandas:', e);
-    toast('Erro ao carregar demandas. Verifique sua conexão com o Supabase.', 'error');
-    allDemandas = []; // garante que não fique undefined
+    console.error('[APP] Erro ao carregar demandas:', e);
+    toast('Erro ao carregar demandas: ' + e.message, 'error');
+    allDemandas = [];
   } finally {
     mostrarLoading(false);
   }
@@ -133,13 +135,10 @@ function aplicarFiltros() {
   const pd = { P0:0, P1:1, P2:2, P3:3, P4:4, P5:5 };
   const st = { 'Aberta':0, 'Em Análise':1, 'Em Andamento':2, 'Concluída':3, 'Cancelada':4 };
   filteredDemandas.sort((a, b) => {
-      // 1º critério: status (Concluída e Cancelada vão para o final)
       const statusDiff = (st[a.status || 'Aberta'] ?? 0) - (st[b.status || 'Aberta'] ?? 0);
       if (statusDiff !== 0) return statusDiff;
-      // 2º critério: prioridade (menor número = mais prioritário)
       const prioDiff = (pd[a.prioridade] ?? 99) - (pd[b.prioridade] ?? 99);
       if (prioDiff !== 0) return prioDiff;
-      // 3º critério: data (mais recente primeiro)
       return new Date(b.data) - new Date(a.data);
   });
   renderDemandasTable();
@@ -342,7 +341,6 @@ function buildLocalOptions(selected) {
 
 // ---- Nova / Duplicar ----
 async function openNovaDemanda(sourceId) {
-  // Garantir que sites e locais estejam carregados
   if (!allSites.length) {
     mostrarLoading(true);
     try { allSites = await dbCarregarSites(); } catch(e) {}
@@ -509,11 +507,7 @@ async function submitSite() {
   const descricao = document.getElementById('site-descricao').value.trim() || null;
   if (!nome) { toast('Informe o nome do site.', 'error'); return; }
 
-  const site = {
-    id: editingSiteId || gerarIDSite(),
-    nome,
-    descricao
-  };
+  const site = { id: editingSiteId || gerarIDSite(), nome, descricao };
 
   mostrarLoading(true);
   try {
@@ -528,7 +522,6 @@ async function submitSite() {
 
 async function excluirSite(id) {
   if (!confirm('Excluir site? Esta ação é irreversível.')) return;
-  // Verificar se há demandas vinculadas
   const vinculadas = allDemandas.filter(d => d.site === allSites.find(s => s.id === id)?.nome);
   if (vinculadas.length > 0) {
     if (!confirm(`Atenção: ${vinculadas.length} demanda(s) estão vinculadas a este site. Deseja excluir mesmo assim?`)) return;
@@ -569,11 +562,7 @@ async function submitLocal() {
   const descricao = document.getElementById('local-descricao').value.trim() || null;
   if (!nome) { toast('Informe o nome do local.', 'error'); return; }
 
-  const local = {
-    id: editingLocalId || gerarIDLocal(),
-    nome,
-    descricao
-  };
+  const local = { id: editingLocalId || gerarIDLocal(), nome, descricao };
 
   mostrarLoading(true);
   try {
@@ -588,7 +577,6 @@ async function submitLocal() {
 
 async function excluirLocal(id) {
   if (!confirm('Excluir local? Esta ação é irreversível.')) return;
-  // Verificar se há demandas vinculadas
   const vinculadas = allDemandas.filter(d => d.local === allLocais.find(l => l.id === id)?.nome);
   if (vinculadas.length > 0) {
     if (!confirm(`Atenção: ${vinculadas.length} demanda(s) estão vinculadas a este local. Deseja excluir mesmo assim?`)) return;
@@ -687,9 +675,7 @@ async function submitUsuario() {
 
   const usuario = {
     id: editingUserId || gerarIDUsuario(),
-    nome,
-    tipo,
-    role,
+    nome, tipo, role,
     senha: senhaFinal,
     dataCriacao: isEdit ? allUsuarios.find(u => u.id === editingUserId)?.dataCriacao : new Date().toISOString()
   };
@@ -776,7 +762,6 @@ function verDetalhe(id) {
 
 // ---- Aceite Planejamento ----
 async function openAceite(id, perfil) {
-  // Garantir que sites e locais estejam carregados
   if (!allSites.length) {
     mostrarLoading(true);
     try { allSites = await dbCarregarSites(); } catch(e) {}
@@ -839,7 +824,6 @@ async function openAceite(id, perfil) {
         <button class="btn btn-primary" onclick="confirmarAceite('planejamento')">Confirmar</button>
       </div>`;
   } else {
-    // Manutenção: somente leitura + atribuição
     const ro = 'background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);color:var(--text2);padding:9px 12px;font-size:14px;';
     document.getElementById('aceite-content').innerHTML = `
       <p style="font-size:12px;color:var(--text3);margin-bottom:14px">Campos da demanda são somente leitura. Defina equipe, prioridade e técnico para iniciar.</p>
@@ -1010,29 +994,22 @@ function showPage(name) {
   document.getElementById('page-' + name).classList.add('active');
   document.getElementById('nav-' + name).classList.add('active');
   if (name === 'login') {
-    renderLoginForm(loginTabAtivo);
+    renderLoginForm(loginTabAtivo || 'login');  // <-- CORREÇÃO: fallback seguro
     if (currentUser) {
       document.getElementById('login-form-area').style.display = 'none';
       document.getElementById('logado-area').style.display     = 'block';
-      document.getElementById('logado-nome').textContent = currentUser.name + ' (' + currentUser.role + ')';
+      document.getElementById('logado-nome').textContent = currentUser.nome + ' (' + currentUser.role + ')';
     }
   }
-  if (name === 'sites') {
-    loadSites();
-  }
-  if (name === 'locais') {
-    loadLocais();
-  }
-  if (name === 'usuarios') {
-    loadUsuarios();
-  }
+  if (name === 'sites') loadSites();
+  if (name === 'locais') loadLocais();
+  if (name === 'usuarios') loadUsuarios();
 }
 
 function openModal(id)  { document.getElementById(id).classList.add('open'); }
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 
 document.addEventListener('DOMContentLoaded', () => {
-  // Fechar modais ao clicar no overlay
   document.querySelectorAll('.modal-overlay').forEach(m => {
     m.addEventListener('click', e => { 
       if (e.target === m) closeModal(m.id); 
@@ -1047,33 +1024,26 @@ document.addEventListener('DOMContentLoaded', () => {
   const iconClose = btn.querySelector('.icon-close');
   const label = btn.querySelector('.btn-label');
 
-  // Função que aplica estado (true = aberto)
   function applyState(isOpen) {
-    // controla o card (compatível com suas classes)
     if (isOpen) {
       card.classList.remove('collapsed', 'hidden');
     } else {
       card.classList.add('collapsed', 'hidden');
     }
-
-    // atualiza botão e ícones
     btn.setAttribute('aria-expanded', String(isOpen));
     if (label) label.textContent = isOpen ? 'Ocultar filtros' : 'Mostrar filtros';
     if (iconFilter) iconFilter.style.display = isOpen ? 'none' : 'inline-block';
     if (iconClose) iconClose.style.display = isOpen ? 'inline-block' : 'none';
   }
 
-  // estado inicial (fechado)
   applyState(false);
 
-  // clique: alterna explicitamente
   btn.addEventListener('click', (e) => {
     e.stopPropagation();
     const isOpen = btn.getAttribute('aria-expanded') === 'true';
     applyState(!isOpen);
   });
 
-  // opcional: fechar ao clicar fora
   document.addEventListener('click', (ev) => {
     if (btn.contains(ev.target)) return;
     if (!card.classList.contains('collapsed') && !card.contains(ev.target)) {
@@ -1100,20 +1070,18 @@ async function init() {
     await openIDB();
     await seedUsuarios();
     await initAuth();
-    
-    // Se não estiver logado, FORÇAR a página de login
+
     if (!currentUser) {
       showPage('login');
     } else {
       showPage('demandas');
       await loadDemandas();
     }
-    
+
     await atualizarBadgeOffline();
   } catch (e) {
     console.error('Erro na inicialização:', e);
     toast('Erro ao inicializar o app. Verifique sua conexão.', 'error');
-    // Mesmo com erro, mostrar login para não travar em tela branca
     showPage('login');
   }
 }
@@ -1123,7 +1091,6 @@ function toggleMultiSelect(id) {
   document.getElementById(id).classList.toggle('open');
 }
 
-// Fecha dropdowns ao clicar fora
 document.addEventListener('click', (e) => {
   if (!e.target.closest('.multi-select')) {
     document.querySelectorAll('.multi-select.open').forEach(el => el.classList.remove('open'));
@@ -1134,8 +1101,6 @@ function getMultiSelectValues(id) {
   const container = document.getElementById(id);
   const checkboxes = container.querySelectorAll('input[type="checkbox"]:checked');
   const values = Array.from(checkboxes).map(cb => cb.value);
-
-  // Atualiza label do trigger
   const label = container.querySelector('.multi-select-label');
   if (values.length === 0) {
     label.textContent = 'Status';
@@ -1144,7 +1109,6 @@ function getMultiSelectValues(id) {
   } else {
     label.textContent = `${values.length} selecionados`;
   }
-
   return values;
 }
 

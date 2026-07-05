@@ -158,16 +158,32 @@ function usuarioFromDb(r) {
 
 /** Carrega todas as demandas. Online = Supabase; Offline = cache IDB */
 async function dbCarregarDemandas() {
+  // 1. Offline: sempre usa cache
   if (!navigator.onLine) {
     const cached = await idbAll('demandas');
+    console.log('[DB] Offline. Cache local:', cached.length, 'demandas');
     return cached.map(fromDb);
   }
+
+  // 2. Online: tenta Supabase
   try {
     const rows = await sbSelect('demandas', 'order=data.desc,data_hora.desc');
-    for (const r of rows) await idbPut('demandas', r);
-    return rows.map(fromDb);
+    console.log('[DB] Supabase respondeu:', rows.length, 'demandas');
+
+    // Só sobrescreve o cache se o Supabase trouxe dados (evita apagar local por RLS/erro)
+    if (Array.isArray(rows) && rows.length > 0) {
+      for (const r of rows) await idbPut('demandas', r);
+      return rows.map(fromDb);
+    }
+
+    // Se veio vazio, usa cache local como fallback
+    console.warn('[DB] Supabase retornou vazio. Usando cache local...');
+    const cached = await idbAll('demandas');
+    return cached.map(fromDb);
+
   } catch (err) {
-    console.warn('Supabase offline, usando cache:', err);
+    console.error('[DB] Erro no Supabase:', err.message);
+    toast('Supabase indisponível. Usando dados locais.', 'info');
     const cached = await idbAll('demandas');
     return cached.map(fromDb);
   }

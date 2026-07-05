@@ -21,8 +21,8 @@ async function login(nome, senha) {
   currentUser = {
     id: usuario.id,
     nome: usuario.nome,
-    role: usuario.role, // 'admin', 'planejamento', 'manutencao'
-    tipo: usuario.tipo  // 'admin' ou 'normal'
+    role: usuario.role,
+    tipo: usuario.tipo
   };
   localStorage.setItem('spci_user', JSON.stringify(currentUser));
   updateAuthUI();
@@ -58,12 +58,11 @@ function updateAuthUI() {
       logArea.style.display  = 'none';
       if (formArea) {
         formArea.style.display = 'block';
-        renderLoginForm(); // Re-renderiza o form caso tenha sido limpo
+        renderLoginForm('login'); // <-- CORREÇÃO: garantir parâmetro
       }
     }
   }
 
-  // Atualizar visibilidade dos botões de navegação baseado na role
   updateNavVisibility();
   renderDemandasTable();
 }
@@ -93,7 +92,8 @@ function isManutencao() {
 }
 
 // ---- UI de login ----
-function renderLoginForm() {
+function renderLoginForm(tab) {
+  loginTabAtivo = tab || 'login';  // <-- CORREÇÃO: garantir valor padrão
   const formArea = document.getElementById('login-form-area');
   if (!formArea) return;
 
@@ -172,7 +172,6 @@ async function salvarSenha() {
     return; 
   }
 
-  // Buscar usuário atual no banco
   const usuarios = await dbCarregarUsuarios();
   const usuario = usuarios.find(u => u.id === currentUser.id);
 
@@ -192,7 +191,6 @@ async function salvarSenha() {
 async function seedUsuarios() {
   const usuarios = await dbCarregarUsuarios();
 
-  // Verifica se já existem usuários
   if (usuarios.length === 0) {
     const defaultUsers = [
       { id: 'USR-' + Date.now() + '-1', nome: 'Anderson', senha: '986532', role: 'admin', tipo: 'admin', dataCriacao: new Date().toISOString() },
