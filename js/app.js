@@ -282,11 +282,14 @@ function renderLocaisTable() {
   if (!allLocais.length) { tbody.innerHTML = ''; empty.style.display = 'block'; return; }
   empty.style.display = 'none';
 
-  tbody.innerHTML = allLocais.map(l => `
+  tbody.innerHTML = allLocais.map(l => {
+    const siteNome = l.siteNome || (l.siteId ? '—' : '—');
+    return `
     <tr>
       <td class="td-mono">${esc(l.id)}</td>
       <td><strong>${esc(l.nome)}</strong></td>
-      <td style="max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${esc(l.descricao||'')}">${esc(l.descricao||'—')}</td>
+      <td>${esc(siteNome)}</td>
+      <td style="max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${esc(l.descricao||'')}">${esc(l.descricao||'—')}</td>
       <td>
         <div style="display:flex;gap:4px">
           <button class="btn btn-secondary btn-sm btn-icon" title="Editar" onclick="openModalLocal('${l.id}')">
@@ -297,8 +300,8 @@ function renderLocaisTable() {
           </button>
         </div>
       </td>
-    </tr>
-  `).join('');
+    </tr>`;
+  }).join('');
 }
 
 // ---- Tabela Usuários ----
@@ -335,9 +338,25 @@ function buildSiteOptions(selected) {
   return `<option value="">— Selecione —</option>` + opts;
 }
 
-function buildLocalOptions(selected) {
-  const opts = allLocais.map(l => `<option value="${esc(l.nome)}" ${l.nome === selected ? 'selected' : ''}>${esc(l.nome)}</option>`).join('');
+function buildLocalOptions(selected, siteNome) {
+  let locaisFiltrados = allLocais;
+  if (siteNome) {
+    const site = allSites.find(s => s.nome === siteNome);
+    if (site) {
+      locaisFiltrados = allLocais.filter(l => l.siteId === site.id);
+    }
+  }
+  const opts = locaisFiltrados.map(l => `<option value="${esc(l.nome)}" ${l.nome === selected ? 'selected' : ''}>${esc(l.nome)}</option>`).join('');
   return `<option value="">— Selecione —</option>` + opts;
+}
+
+// NOVO: Atualiza o select de locais baseado no site selecionado
+function atualizarLocaisPorSite(selectSiteId, selectLocalId, selectedLocal) {
+  const siteNome = document.getElementById(selectSiteId).value;
+  const localSelect = document.getElementById(selectLocalId);
+  if (!localSelect) return;
+  const currentVal = selectedLocal !== undefined ? selectedLocal : localSelect.value;
+  localSelect.innerHTML = buildLocalOptions(currentVal, siteNome);
 }
 
 // ---- Nova / Duplicar ----
@@ -387,12 +406,12 @@ async function openNovaDemanda(sourceId) {
       Campos pré-preenchidos com base em <b>${src.id}</b>. Um novo ID será gerado ao registrar.</div>` : ''}
     <div class="form-row">
       <div class="form-group"><label class="form-label">Site *</label>
-        <select class="form-control" id="nd-site" required>
+        <select class="form-control" id="nd-site" required onchange="atualizarLocaisPorSite('nd-site','nd-local')">
           ${buildSiteOptions(src?.site || '')}
         </select></div>
       <div class="form-group"><label class="form-label">Local *</label>
         <select class="form-control" id="nd-local" required>
-          ${buildLocalOptions(src?.local || '')}
+          ${buildLocalOptions(src?.local || '', src?.site || '')}
         </select></div>
     </div>
     <div class="form-row">
@@ -542,7 +561,20 @@ function openModalLocal(id) {
   const l = isEdit ? allLocais.find(x => x.id === id) : null;
   editingLocalId = isEdit ? id : null;
   document.getElementById('local-titulo').textContent = isEdit ? 'Editar Local' : 'Novo Local';
+
+  const siteOptions = allSites.map(s =>
+    `<option value="${esc(s.id)}" ${l?.siteId === s.id ? 'selected' : ''}>${esc(s.nome)}</option>`
+  ).join('');
+
   document.getElementById('local-body').innerHTML = `
+    
+    <div class="form-group">
+      <label class="form-label">Site *</label>
+      <select class="form-control" id="local-site" required>
+        <option value="">— Selecione um site —</option>
+        ${siteOptions}
+      </select>
+    </div>
     <div class="form-group">
       <label class="form-label">Nome do Local *</label>
       <input class="form-control" id="local-nome" value="${esc(l?.nome||'')}" placeholder="Ex: Blower A — Sala 01" required>
@@ -560,15 +592,18 @@ function openModalLocal(id) {
 
 async function submitLocal() {
   const nome = document.getElementById('local-nome').value.trim();
+  const siteId = document.getElementById('local-site').value;
   const descricao = document.getElementById('local-descricao').value.trim() || null;
   if (!nome) { toast('Informe o nome do local.', 'error'); return; }
+  if (!siteId) { toast('Selecione o site ao qual este local pertence.', 'error'); return; }
 
-  const local = { id: editingLocalId || gerarIDLocal(), nome, descricao };
+  const local = { id: editingLocalId || gerarIDLocal(), nome, siteId, descricao };
 
   mostrarLoading(true);
   try {
     await dbSalvarLocal(local);
     closeModal('modal-local');
+    // Recarrega locais e sites para manter consistência
     await loadLocais();
     toast(editingLocalId ? 'Local atualizado!' : 'Local cadastrado!', 'success');
   } catch(e) {
@@ -788,12 +823,12 @@ async function openAceite(id, perfil) {
         ID (não editável): <span style="font-family:var(--mono);color:var(--text);font-weight:600">${d.id}</span></div>
       <div class="form-row">
         <div class="form-group"><label class="form-label">Site *</label>
-          <select class="form-control" id="ac-site" required>
+          <select class="form-control" id="ac-site" required onchange="atualizarLocaisPorSite('ac-site','ac-local')">
             ${buildSiteOptions(d.site || '')}
           </select></div>
         <div class="form-group"><label class="form-label">Local *</label>
           <select class="form-control" id="ac-local" required>
-            ${buildLocalOptions(d.local || '')}
+            ${buildLocalOptions(d.local || '', d.site || '')}
           </select></div>
       </div>
       <div class="form-row">

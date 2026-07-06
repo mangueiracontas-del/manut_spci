@@ -4,7 +4,7 @@
 // ============================================================
 
 // ---- IndexedDB (cache offline) ----
-const IDB_NAME = 'spci_cache', IDB_VERSION = 3;
+const IDB_NAME = 'spci_cache', IDB_VERSION = 4;  // VERSÃO 4: adiciona site_id em locais
 let idb;
 
 function openIDB() {
@@ -20,8 +20,17 @@ function openIDB() {
         d.createObjectStore('config', { keyPath: 'key' });
       if (!d.objectStoreNames.contains('sites'))
         d.createObjectStore('sites', { keyPath: 'id' });
-      if (!d.objectStoreNames.contains('locais'))
-        d.createObjectStore('locais', { keyPath: 'id' });
+      if (!d.objectStoreNames.contains('locais')) {
+        const os = d.createObjectStore('locais', { keyPath: 'id' });
+        os.createIndex('site_id', 'site_id', { unique: false });
+      } else {
+        // Migração: garante índice site_id se já existe
+        const tx = e.target.transaction;
+        const os = tx.objectStore('locais');
+        if (!os.indexNames.contains('site_id')) {
+          os.createIndex('site_id', 'site_id', { unique: false });
+        }
+      }
       if (!d.objectStoreNames.contains('usuarios'))
         d.createObjectStore('usuarios', { keyPath: 'id' });
     };
@@ -154,6 +163,25 @@ function usuarioFromDb(r) {
   };
 }
 
+// ---- Mapeamento de locais (novo: site_id) ----
+function localToDb(l) {
+  return {
+    id:          l.id,
+    nome:        l.nome,
+    descricao:   l.descricao || null,
+    site_id:     l.siteId || null
+  };
+}
+
+function localFromDb(r) {
+  return {
+    id:          r.id,
+    nome:        r.nome,
+    descricao:   r.descricao,
+    siteId:      r.site_id
+  };
+}
+
 // ---- API pública usada pelo app ----
 
 /** Carrega todas as demandas. Online = Supabase; Offline = cache IDB */
@@ -233,29 +261,60 @@ async function dbExcluirSite(id) {
   }
 }
 
-// ---- LOCAIS ----
+// ---- LOCAIS (com site_id / chave estrangeira) ----
 
-async function dbCarregarLocais() {
+async function dbCarregarLocais(siteId = null) {
+  // Offline: usa cache IDB, filtra por site_id se necessário
   if (!navigator.onLine) {
-    const cached = await idbAll('locais');
-    return cached;
+    let cached = await idbAll('locais');
+    if (siteId) {
+      cached = cached.filter(l => l.site_id === siteId);
+    }
+    // Enriquece com nome do site do cache
+    const sitesCache = await idbAll('sites');
+    const siteMap = Object.fromEntries(sitesCache.map(s => [s.id, s.nome]));
+    return cached.map(r => ({
+      ...localFromDb(r),
+      siteNome: siteMap[r.site_id] || null
+    }));
   }
+  // Online: consulta Supabase com embedded select para trazer nome do site
   try {
-    const rows = await sbSelect('locais', 'order=nome.asc');
+    let params = 'select=*,sites(nome)&order=nome.asc';
+    if (siteId) {
+      params += '&site_id=eq.' + encodeURIComponent(siteId);
+    }
+    const rows = await sbSelect('locais', params);
+    // Mapeia para o formato do app, incluindo siteNome
+    const mapped = rows.map(r => ({
+      ...localFromDb(r),
+      siteNome: r.sites?.nome || null
+    }));
+    // Salva no cache IDB (sem o siteNome, apenas dados crus)
     for (const r of rows) await idbPut('locais', r);
-    return rows;
+    return mapped;
   } catch (err) {
     console.warn('Supabase offline, usando cache locais:', err);
-    return await idbAll('locais');
+    let cached = await idbAll('locais');
+    if (siteId) {
+      cached = cached.filter(l => l.site_id === siteId);
+    }
+    const sitesCache = await idbAll('sites');
+    const siteMap = Object.fromEntries(sitesCache.map(s => [s.id, s.nome]));
+    return cached.map(r => ({
+      ...localFromDb(r),
+      siteNome: siteMap[r.site_id] || null
+    }));
   }
 }
 
 async function dbSalvarLocal(local) {
-  await idbPut('locais', local);
+  const row = localToDb(local);
+  await idbPut('locais', row);
   if (navigator.onLine) {
-    await sbUpsert('locais', local);
+    await sbUpsert('locais', row);
   } else {
-    await idbPut('queue', { action: 'upsert', table: 'locais', row: local, ts: Date.now() });
+    await idbPut('queue', { action: 'upsert', table: 'locais', row, ts: Date.now() });
     atualizarBadgeOffline();
   }
 }
