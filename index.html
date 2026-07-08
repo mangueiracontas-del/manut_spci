@@ -113,6 +113,7 @@
     <label class="multi-select-option"><input type="checkbox" value="Em Análise" onchange="aplicarFiltros()"> Em Análise</label>
     <label class="multi-select-option"><input type="checkbox" value="Em Andamento" onchange="aplicarFiltros()"> Em Andamento</label>
     <label class="multi-select-option"><input type="checkbox" value="Concluída" onchange="aplicarFiltros()"> Concluída</label>
+    <label class="multi-select-option"><input type="checkbox" value="Improcedente" onchange="aplicarFiltros()"> Improcedente</label>
   </div>
 </div>
       <select class="form-control" id="f-equipe" onchange="aplicarFiltros()">
@@ -359,6 +360,20 @@
       </button>
     </div>
     <div id="local-body"></div>
+  </div>
+</div>
+
+
+<!-- ALTERAR STATUS (Admin) -->
+<div class="modal-overlay" id="modal-alterar-status">
+  <div class="modal" style="max-width:520px">
+    <div class="modal-header">
+      <h2 class="modal-title">Alterar Status da Demanda</h2>
+      <button class="close-btn" onclick="closeModal('modal-alterar-status')">
+        <svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor"><path d="M2 2l12 12M14 2L2 14"/></svg>
+      </button>
+    </div>
+    <div id="alterar-status-content"></div>
   </div>
 </div>
 

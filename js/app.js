@@ -133,7 +133,7 @@ function aplicarFiltros() {
   });
 
   const pd = { P0:0, P1:1, P2:2, P3:3, P4:4, P5:5 };
-  const st = { 'Aberta':0, 'Em Análise':1, 'Em Andamento':2, 'Concluída':3, 'Cancelada':4 };
+  const st = { 'Aberta':0, 'Em Análise':1, 'Em Andamento':2, 'Concluída':3, 'Cancelada':4, 'Improcedente':3 };
   filteredDemandas.sort((a, b) => {
       const statusDiff = (st[a.status || 'Aberta'] ?? 0) - (st[b.status || 'Aberta'] ?? 0);
       if (statusDiff !== 0) return statusDiff;
@@ -159,7 +159,7 @@ function situacaoBadge(s) {
   return `<span class="badge ${map[s]||'badge-gray'} no-border">${s ? s.split(' - ')[1]||s : '—'}</span>`;
 }
 function statusBadge(s) {
-  const map = { 'Aberta':'badge-blue', 'Em Análise':'badge-purple', 'Em Andamento':'badge-orange', 'Concluída':'badge-green', 'Cancelada':'badge-gray' };
+  const map = { 'Aberta':'badge-blue', 'Em Análise':'badge-purple', 'Em Andamento':'badge-orange', 'Concluída':'badge-green', 'Cancelada':'badge-gray', 'Improcedente':'badge-green' };
   const v = s || 'Aberta';
   return `<span class="badge ${map[v]||'badge-gray'}">${v}</span>`;
 }
@@ -194,7 +194,7 @@ function renderDemandasTable() {
 
   tbody.innerHTML = filteredDemandas.map(d => {
     const st       = d.status || 'Aberta';
-    const encerrada = st === 'Concluída' || st === 'Cancelada';
+    const encerrada = st === 'Concluída' || st === 'Cancelada' || st === 'Improcedente';
     const btnDup = `<button class="btn btn-secondary btn-sm btn-icon" title="Duplicar" onclick="event.stopPropagation();openNovaDemanda('${d.id}')">
       <svg class="icon" viewBox="0 0 16 16" fill="currentColor"><path d="M5 1h7l3 3v9H5V1zm2 0v3h6M1 5h4v10h8"/></svg>
     </button>`;
@@ -246,6 +246,7 @@ function renderStats() {
     <div class="stat-card"><div class="stat-label">Em Andamento</div><div class="stat-value" style="color:var(--orange)">${d.filter(x=>x.status==='Em Andamento').length}</div><div class="stat-sub">em andamento</div></div>
     <div class="stat-card"><div class="stat-label">Críticos</div><div class="stat-value" style="color:var(--red)">${d.filter(x=>x.situacao?.includes('Crítico')).length}</div><div class="stat-sub">críticos</div></div>
     <div class="stat-card"><div class="stat-label">Concluídas</div><div class="stat-value" style="color:var(--green)">${d.filter(x=>x.status==='Concluída').length}</div><div class="stat-sub">resolvidas</div></div>
+    <div class="stat-card"><div class="stat-label">Improcedentes</div><div class="stat-value" style="color:var(--green)">${d.filter(x=>x.status==='Improcedente').length}</div><div class="stat-sub">improcedentes</div></div>
   `;
 }
 
@@ -434,15 +435,7 @@ async function openNovaDemanda(sourceId) {
       <label class="form-label">Descrição Detalhada *</label>
       <textarea class="form-control" id="nd-descricao" rows="4" placeholder="Descreva a falha em detalhes..." required style="min-height:90px">${esc(src?.descricao||'')}</textarea>
     </div>
-    <div class="form-group">
-      <label class="form-label">Foto do Defeito</label>
-      <div class="photo-upload">
-        <input type="file" accept="image/*" id="nd-foto" onchange="previewFoto()">
-        <svg width="28" height="28" viewBox="0 0 32 32" fill="none" style="margin-bottom:6px;opacity:.4"><rect x="2" y="6" width="28" height="20" rx="3" stroke="currentColor" stroke-width="1.5"/><circle cx="8" cy="12" r="1.5" fill="currentColor"/><path d="M2 20l8-8 6 6 10-10" stroke="currentColor" stroke-width="1.5" fill="none"/></svg>
-        <p style="color:var(--text3);font-size:12px">Clique ou arraste uma imagem</p>
-        <img id="foto-preview" class="photo-preview-img" alt="preview">
-      </div>
-    </div>
+
     ${secaoDir}
     <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px">
       <button type="button" class="btn btn-secondary" onclick="closeModal('modal-nova')">Cancelar</button>
@@ -451,13 +444,7 @@ async function openNovaDemanda(sourceId) {
   openModal('modal-nova');
 }
 
-function previewFoto() {
-  const f = document.getElementById('nd-foto').files[0];
-  if (!f) return;
-  const r = new FileReader();
-  r.onload = e => { const img = document.getElementById('foto-preview'); img.src = e.target.result; img.style.display = 'block'; };
-  r.readAsDataURL(f);
-}
+
 
 async function submitNovaDemanda() {
   const site       = document.getElementById('nd-site').value.trim();
@@ -468,11 +455,6 @@ async function submitNovaDemanda() {
   const descricao  = document.getElementById('nd-descricao').value.trim();
   if (!site||!local||!tag||!solicitante||!situacao||!descricao) { toast('Preencha todos os campos obrigatórios.','error'); return; }
 
-  const fotoInput = document.getElementById('nd-foto');
-  let foto = null;
-  if (fotoInput?.files[0]) {
-    foto = await new Promise(r => { const fr = new FileReader(); fr.onload = e => r(e.target.result); fr.readAsDataURL(fotoInput.files[0]); });
-  }
   const equipeEl   = document.getElementById('nd-equipe');
   const prioEl     = document.getElementById('nd-prioridade');
   const equipe     = equipeEl ? equipeEl.value || null : null;
@@ -482,7 +464,7 @@ async function submitNovaDemanda() {
 
   const d = {
     id: gerarID(), data: new Date().toISOString().split('T')[0], dataHora: new Date().toISOString(),
-    site, local, tag, solicitante, situacao, descricao, foto,
+    site, local, tag, solicitante, situacao, descricao,
     status: statusInicial, prioridade, equipe,
     comentarioPlan: null, analise: null, resolucao: null, om: null,
     dataAceite: equipe ? new Date().toISOString().split('T')[0] : null,
@@ -746,11 +728,11 @@ function verDetalhe(id) {
   if (!d) return;
   document.getElementById('detalhe-titulo').textContent = 'Demanda ' + d.id;
   document.getElementById('detalhe-data').textContent   = 'Registrada em ' + formatDateTime(d.dataHora) + ' por ' + d.solicitante;
-  const steps = ['Aberta','Em Análise','Em Andamento','Concluída'];
+  const steps = ['Aberta','Em Análise','Em Andamento','Concluída','Improcedente'];
   const si    = steps.indexOf(d.status || 'Aberta');
   const stepHtml = steps.map((s,i) => `<div class="status-step"><div class="step-dot ${i<si?'done':i===si?'active':''}">${i<si?'✓':i+1}</div><div class="step-label">${s}</div></div>`).join('');
   const st       = d.status || 'Aberta';
-  const encerrada= st === 'Concluída' || st === 'Cancelada';
+  const encerrada= st === 'Concluída' || st === 'Cancelada' || st === 'Improcedente';
   const isPlan   = currentUser?.role === 'planejamento';
   const isMan    = currentUser?.role === 'manutencao';
 
@@ -793,6 +775,7 @@ function verDetalhe(id) {
         <button class="btn btn-danger btn-sm" onclick="closeModal('modal-detalhe');excluirDemanda('${d.id}')">Excluir</button>`:''}
       ${isMan&&!encerrada?`<button class="btn btn-secondary btn-sm" onclick="closeModal('modal-detalhe');openAceite('${d.id}','manutencao')">Aceitar / Editar</button>`:''}
       ${isMan&&st==='Em Andamento'?`<button class="btn btn-primary btn-sm" onclick="closeModal('modal-detalhe');openAnalise('${d.id}')">Lançar Análise</button>`:''}
+      ${isAdmin()&&(encerrada)?`<button class="btn btn-secondary btn-sm" onclick="closeModal('modal-detalhe');openAlterarStatus('${d.id}')">Alterar Status</button>`:''}
     </div>`;
   openModal('modal-detalhe');
 }
@@ -958,6 +941,7 @@ async function openAnalise(id) {
       <select class="form-control" id="al-status">
         <option value="Em Andamento" ${d.status==='Em Andamento'?'selected':''}>Em Andamento</option>
         <option value="Concluída" ${d.status==='Concluída'?'selected':''}>Concluída</option>
+        <option value="Improcedente" ${d.status==='Improcedente'?'selected':''}>Improcedente</option>
       </select></div>
     <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px">
       <button class="btn btn-secondary" onclick="closeModal('modal-analise')">Cancelar</button>
@@ -973,7 +957,7 @@ async function salvarAnalise() {
   d.analise  = document.getElementById('al-analise').value.trim()   || null;
   d.resolucao= document.getElementById('al-resolucao').value.trim() || null;
   d.status   = document.getElementById('al-status').value;
-  if (d.status === 'Concluída') d.dataConclusao = new Date().toISOString().split('T')[0];
+  if (d.status === 'Concluída' || d.status === 'Improcedente') d.dataConclusao = new Date().toISOString().split('T')[0];
   mostrarLoading(true);
   try {
     await dbSalvarDemanda(d);
@@ -983,6 +967,72 @@ async function salvarAnalise() {
   } catch(e) { toast('Erro: ' + e.message,'error'); }
   finally { mostrarLoading(false); }
 }
+
+// ---- Alterar Status (Admin) ----
+async function openAlterarStatus(id) {
+  const d = allDemandas.find(x => x.id === id);
+  if (!d) return;
+  editingId = id;
+  document.getElementById('alterar-status-content').innerHTML = `
+    <p style="font-size:12px;color:var(--text3);margin-bottom:14px">Você está alterando o status da demanda <b>${esc(d.id)}</b>. Esta ação é restrita a administradores.</p>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Status Atual</label>
+        <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);color:var(--text2);padding:9px 12px;font-size:14px;font-family:var(--mono)">${esc(d.status || 'Aberta')}</div></div>
+      <div class="form-group"><label class="form-label">Novo Status *</label>
+        <select class="form-control" id="alt-status">
+          <option value="Aberta" ${d.status==='Aberta'?'selected':''}>Aberta</option>
+          <option value="Em Análise" ${d.status==='Em Análise'?'selected':''}>Em Análise</option>
+          <option value="Em Andamento" ${d.status==='Em Andamento'?'selected':''}>Em Andamento</option>
+          <option value="Concluída" ${d.status==='Concluída'?'selected':''}>Concluída</option>
+          <option value="Improcedente" ${d.status==='Improcedente'?'selected':''}>Improcedente</option>
+          <option value="Cancelada" ${d.status==='Cancelada'?'selected':''}>Cancelada</option>
+        </select></div>
+    </div>
+    <div class="form-group"><label class="form-label">Motivo da Alteração *</label>
+      <textarea class="form-control" id="alt-motivo" rows="3" placeholder="Informe o motivo da alteração de status..." required></textarea></div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px">
+      <button class="btn btn-secondary" onclick="closeModal('modal-alterar-status')">Cancelar</button>
+      <button class="btn btn-primary" onclick="confirmarAlterarStatus()">Confirmar Alteração</button>
+    </div>`;
+  openModal('modal-alterar-status');
+}
+
+async function confirmarAlterarStatus() {
+  const d = allDemandas.find(x => x.id === editingId);
+  if (!d) return;
+
+  const novoStatus = document.getElementById('alt-status').value;
+  const motivo = document.getElementById('alt-motivo').value.trim();
+
+  if (!motivo) { toast('Informe o motivo da alteração.','error'); return; }
+  if (novoStatus === d.status) { toast('Selecione um status diferente do atual.','error'); return; }
+
+  // Atualiza o status
+  d.status = novoStatus;
+
+  // Se voltar para um status não-encerrado, limpa data de conclusão
+  const encerrados = ['Concluída', 'Improcedente', 'Cancelada'];
+  if (!encerrados.includes(novoStatus)) {
+    d.dataConclusao = null;
+  } else {
+    // Se for para encerrado, define data de conclusão
+    d.dataConclusao = new Date().toISOString().split('T')[0];
+  }
+
+  // Adiciona o motivo como comentário do planejamento (append)
+  const logEntry = `[${new Date().toLocaleString('pt-BR')}] Admin alterou status de "${d.status}" para "${novoStatus}". Motivo: ${motivo}`;
+  d.comentarioPlan = d.comentarioPlan ? d.comentarioPlan + "\n\n" + logEntry : logEntry;
+
+  mostrarLoading(true);
+  try {
+    await dbSalvarDemanda(d);
+    closeModal('modal-alterar-status');
+    await loadDemandas();
+    toast('Status da demanda ' + d.id + ' alterado com sucesso!', 'success');
+  } catch(e) { toast('Erro: ' + e.message,'error'); }
+  finally { mostrarLoading(false); }
+}
+
 
 // ---- Excluir ----
 async function excluirDemanda(id) {
