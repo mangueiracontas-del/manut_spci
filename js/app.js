@@ -1075,6 +1075,12 @@ function mostrarLoading(show) {
 }
 
 function showPage(name) {
+  // Proteção de acesso à página de relatório
+  if (name === 'relatorio' && !isRelatorioAccess()) {
+    toast('Acesso negado. Apenas usuários de Manutenção, Planejamento ou Admin podem acessar o relatório.', 'error');
+    showPage('demandas');
+    return;
+  }
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('page-' + name).classList.add('active');
@@ -1093,6 +1099,7 @@ function showPage(name) {
   if (name === 'sites') loadSites();
   if (name === 'locais') loadLocais();
   if (name === 'usuarios') loadUsuarios();
+  if (name === 'relatorio') loadRelatorio();
 }
 
 function openModal(id)  { document.getElementById(id).classList.add('open'); }
@@ -1182,6 +1189,417 @@ function calcularTempoVida(d) {
 }
 
 function esc(s)           { if(!s) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+
+// ============================================================
+// RELATÓRIO DIÁRIO DE MANUTENÇÕES
+// ============================================================
+
+let relatorioFiltrado = [];
+let relatorioSelecionados = new Set(); // IDs das demandas selecionadas para o relatório
+
+async function loadRelatorio() {
+  mostrarLoading(true);
+  try {
+    // Garante que demandas estão carregadas
+    if (!allDemandas.length) {
+      allDemandas = await dbCarregarDemandas();
+    }
+
+    // Define data padrão como hoje
+    const hoje = new Date().toISOString().split('T')[0];
+    const dataInput = document.getElementById('rel-data');
+    if (dataInput && !dataInput.value) {
+      dataInput.value = hoje;
+    }
+
+    aplicarFiltrosRelatorio();
+  } catch(e) {
+    console.error('[APP] Erro ao carregar relatório:', e);
+    toast('Erro ao carregar relatório: ' + e.message, 'error');
+  } finally {
+    mostrarLoading(false);
+  }
+}
+
+function aplicarFiltrosRelatorio() {
+  const data = document.getElementById('rel-data').value;
+
+  // Filtra apenas demandas concluídas ou improcedentes com data de conclusão
+  relatorioFiltrado = allDemandas.filter(d => {
+    const st = d.status || 'Aberta';
+    if (st !== 'Concluída' && st !== 'Improcedente') return false;
+    if (data && d.dataConclusao !== data) return false;
+    if (!data && !d.dataConclusao) return false;
+    return true;
+  });
+
+  // Ordena por data de conclusão decrescente, depois por prioridade
+  const pd = { P0: 0, P1: 1, P2: 2, P3: 3, P4: 4, P5: 5 };
+  relatorioFiltrado.sort((a, b) => {
+    const dataDiff = new Date(b.dataConclusao || b.data) - new Date(a.dataConclusao || a.data);
+    if (dataDiff !== 0) return dataDiff;
+    return (pd[a.prioridade] ?? 99) - (pd[b.prioridade] ?? 99);
+  });
+
+  renderRelatorioTable();
+  renderRelatorioStats();
+  atualizarContadorSelecionados();
+}
+
+function limparFiltrosRelatorio() {
+  const dataInput = document.getElementById('rel-data');
+  if (dataInput) dataInput.value = '';
+  relatorioSelecionados.clear();
+  aplicarFiltrosRelatorio();
+}
+
+function renderRelatorioTable() {
+  const tbody = document.getElementById('relatorio-tbody');
+  const empty = document.getElementById('empty-relatorio');
+  const checkAll = document.getElementById('rel-check-all');
+
+  if (!relatorioFiltrado.length) { 
+    if (tbody) tbody.innerHTML = ''; 
+    if (empty) empty.style.display = 'block'; 
+    if (checkAll) checkAll.checked = false;
+    return; 
+  }
+  if (empty) empty.style.display = 'none';
+
+  // Verifica se todos estão selecionados
+  const todosSelecionados = relatorioFiltrado.length > 0 && 
+    relatorioFiltrado.every(d => relatorioSelecionados.has(d.id));
+  if (checkAll) checkAll.checked = todosSelecionados;
+
+  if (!tbody) return;
+  tbody.innerHTML = relatorioFiltrado.map(d => {
+    const selecionado = relatorioSelecionados.has(d.id) ? 'checked' : '';
+    return `
+    <tr>
+      <td style="text-align:center" onclick="event.stopPropagation()">
+        <input type="checkbox" ${selecionado} onchange="toggleSelecaoRelatorio('${d.id}', this.checked)" style="cursor:pointer;width:16px;height:16px;accent-color:var(--blue-light)">
+      </td>
+      <td class="td-mono">${esc(d.id)}</td>
+      <td class="td-mono">${formatDate(d.dataConclusao)}</td>
+      <td>${esc(d.site)}</td>
+      <td style="max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${esc(d.local)}">${esc(d.local)}</td>
+      <td class="td-mono">${esc(d.tag)}</td>
+      <td>${situacaoBadge(d.situacao)}</td>
+      <td>${equipeBadge(d.equipe)}</td>
+      <td>${esc(d.tecnico || '—')}</td>
+      <td class="td-mono">${esc(d.om || '—')}</td>
+      <td>${statusBadge(d.status)}</td>
+    </tr>`;
+  }).join('');
+}
+
+function renderRelatorioStats() {
+  const grid = document.getElementById('relatorio-stats');
+  if (!grid) return;
+  const d = relatorioFiltrado;
+  const total = d.length;
+  const selecionados = relatorioSelecionados.size;
+  const criticos = d.filter(x => x.situacao?.includes('Crítico')).length;
+  const prioritarios = d.filter(x => x.situacao?.includes('Prioritário')).length;
+  const moderados = d.filter(x => x.situacao?.includes('Moderado')).length;
+  const leves = d.filter(x => x.situacao?.includes('Leve')).length;
+
+  grid.innerHTML = `
+    <div class="stat-card"><div class="stat-label">Total</div><div class="stat-value">${total}</div><div class="stat-sub">manutenções</div></div>
+    <div class="stat-card"><div class="stat-label">Selecionados</div><div class="stat-value" style="color:var(--blue)">${selecionados}</div><div class="stat-sub">para PDF</div></div>
+    <div class="stat-card"><div class="stat-label">Críticas</div><div class="stat-value" style="color:var(--red)">${criticos}</div><div class="stat-sub">paradas</div></div>
+    <div class="stat-card"><div class="stat-label">Prioritárias</div><div class="stat-value" style="color:var(--orange)">${prioritarios}</div><div class="stat-sub">parciais</div></div>
+    <div class="stat-card"><div class="stat-label">Moderadas</div><div class="stat-value" style="color:var(--yellow)">${moderados}</div><div class="stat-sub">restrições</div></div>
+    <div class="stat-card"><div class="stat-label">Leves</div><div class="stat-value" style="color:var(--green)">${leves}</div><div class="stat-sub">operando</div></div>
+  `;
+}
+
+// ---- Seleção de demandas para relatório ----
+
+function toggleSelecaoRelatorio(id, checked) {
+  if (checked) {
+    relatorioSelecionados.add(id);
+  } else {
+    relatorioSelecionados.delete(id);
+  }
+  atualizarContadorSelecionados();
+  renderRelatorioTable();
+  renderRelatorioStats();
+}
+
+function selecionarTodosRelatorio(selecionar) {
+  if (selecionar) {
+    relatorioFiltrado.forEach(d => relatorioSelecionados.add(d.id));
+  } else {
+    relatorioFiltrado.forEach(d => relatorioSelecionados.delete(d.id));
+  }
+  atualizarContadorSelecionados();
+  renderRelatorioTable();
+  renderRelatorioStats();
+}
+
+function toggleSelectAllRelatorio(checkbox) {
+  selecionarTodosRelatorio(checkbox.checked);
+}
+
+function atualizarContadorSelecionados() {
+  const el = document.getElementById('rel-selecionados-count');
+  if (el) el.textContent = relatorioSelecionados.size;
+}
+
+async function gerarRelatorioPDF() {
+  // Usa apenas as demandas selecionadas
+  const demandasParaRelatorio = relatorioFiltrado.filter(d => relatorioSelecionados.has(d.id));
+
+  if (!demandasParaRelatorio.length) { 
+    toast('Nenhuma manutenção selecionada. Marque as demandas desejadas.', 'error'); 
+    return; 
+  }
+
+  mostrarLoading(true);
+  try {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+
+    const dataRel = document.getElementById('rel-data').value;
+    const dataFormatada = dataRel ? formatDate(dataRel) : 'Todas as datas';
+
+    // ── Cores ──
+    const C_TXT    = '#1a1a1a', C_TXT2 = '#555555', C_BORDA = '#bbbbbb';
+    const C_HEADER = '#f0f0f0', C_ALT   = '#f8f8f8', C_ACCENT = '#1F6FEB';
+    const C_RED    = '#dc2626', C_ORANGE = '#ea580c', C_YELLOW = '#ca8a04', C_GREEN = '#16a34a';
+
+    function hexRgb(hex) {
+      const r = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+      return r ? [parseInt(r[1],16), parseInt(r[2],16), parseInt(r[3],16)] : [0,0,0];
+    }
+    function setT(doc, hex) { const [r,g,b]=hexRgb(hex); doc.setTextColor(r,g,b); }
+    function setF(doc, hex) { const [r,g,b]=hexRgb(hex); doc.setFillColor(r,g,b); }
+    function setD(doc, hex) { const [r,g,b]=hexRgb(hex); doc.setDrawColor(r,g,b); }
+
+    const M = 10;
+    const W = 190;
+    const PAGE_H = 297;
+    const FOOTER_H = 8;
+    const USABLE_H = PAGE_H - M - FOOTER_H;
+
+    function drawGlobalHeader(pageNum, totalPages) {
+      setF(doc, C_ACCENT);
+      doc.rect(0, 0, 210, 10, 'F');
+      doc.setTextColor(255,255,255);
+      doc.setFontSize(8); doc.setFont('helvetica','bold');
+      doc.text('Relatorio Diario de Manutencoes — Saneamento e SPCI', M, 5.5);
+      doc.setFontSize(6); doc.setFont('helvetica','normal');
+      doc.text(`Data: ${dataFormatada}  |  Total: ${demandasParaRelatorio.length} manut.  |  Pag. ${pageNum}/${totalPages}`, 140, 5.5);
+    }
+
+    function drawResumoCards(y) {
+      const criticos = demandasParaRelatorio.filter(x => x.situacao?.includes('Critico')).length;
+      const prioritarios = demandasParaRelatorio.filter(x => x.situacao?.includes('Prioritario')).length;
+      const moderados = demandasParaRelatorio.filter(x => x.situacao?.includes('Moderado')).length;
+      const leves = demandasParaRelatorio.filter(x => x.situacao?.includes('Leve')).length;
+
+      const cards = [
+        { l:'Total', v:demandasParaRelatorio.length, c:C_ACCENT },
+        { l:'Criticas', v:criticos, c:C_RED },
+        { l:'Prioritarias', v:prioritarios, c:C_ORANGE },
+        { l:'Moderadas', v:moderados, c:C_YELLOW },
+        { l:'Leves', v:leves, c:C_GREEN }
+      ];
+
+      const cw = 34, ch = 12;
+      let cx = M;
+      cards.forEach(cd => {
+        setD(doc, C_BORDA); doc.setLineWidth(0.25);
+        doc.roundedRect(cx, y, cw, ch, 1.5, 1.5, 'S');
+        const [cr,cg,cb] = hexRgb(cd.c);
+        doc.setFillColor(cr,cg,cb); doc.rect(cx, y, cw, 2, 'F');
+        setT(doc, C_TXT); doc.setFontSize(11); doc.setFont('helvetica','bold');
+        doc.text(String(cd.v), cx + 2.5, y + 8);
+        setT(doc, C_TXT2); doc.setFontSize(6); doc.setFont('helvetica','normal');
+        doc.text(cd.l, cx + 2.5, y + 10.5);
+        cx += cw + 3;
+      });
+      return y + ch + 3;
+    }
+
+    function addSecCompact(y, titulo, texto) {
+      if (!texto || !texto.trim()) return y;
+      const linhas = doc.splitTextToSize(texto, W - 5);
+      const h = Math.max(linhas.length * 2.6 + 4, 6.5);
+
+      setT(doc, C_ACCENT); doc.setFontSize(6); doc.setFont('helvetica','bold');
+      doc.text(titulo.toUpperCase(), M, y);
+      y += 1.5;
+      setF(doc, '#fafafa'); setD(doc, '#dddddd'); doc.setLineWidth(0.12);
+      doc.rect(M, y, W, h, 'F'); doc.rect(M, y, W, h, 'S');
+      setT(doc, C_TXT); doc.setFontSize(6.5); doc.setFont('helvetica','normal');
+      doc.text(linhas, M+2, y+2.5);
+      return y + h + 1.5;
+    }
+
+    function drawDemandaHeader(y, d, idx, total) {
+      const sitColor = d.situacao?.includes('Critico') ? C_RED :
+                       d.situacao?.includes('Prioritario') ? C_ORANGE :
+                       d.situacao?.includes('Moderado') ? C_YELLOW : C_GREEN;
+      const [cr,cg,cb] = hexRgb(sitColor);
+      doc.setFillColor(cr,cg,cb); doc.rect(M, y, 2, 18, 'F');
+
+      setT(doc, C_TXT); doc.setFontSize(10); doc.setFont('helvetica','bold');
+      doc.text(`${d.id}`, M+5, y+4.5);
+      setT(doc, C_TXT2); doc.setFontSize(6.5); doc.setFont('helvetica','normal');
+      doc.text(`${idx+1}/${total}  |  Concluida: ${formatDate(d.dataConclusao)}  |  Site: ${d.site||'—'}  |  Local: ${d.local||'—'}`, M+5, y+8);
+
+      const prio = d.prioridade || '—';
+      const prioW = doc.getTextWidth(prio) + 6;
+      const prioColor = d.prioridade === 'P0' ? '#2D0A0A' :
+                        d.prioridade === 'P1' ? C_RED :
+                        d.prioridade === 'P2' ? C_ORANGE :
+                        d.prioridade === 'P3' ? C_YELLOW : '#666';
+      const [pr,pg,pb] = hexRgb(prioColor);
+      doc.setFillColor(pr,pg,pb); doc.setDrawColor(pr,pg,pb);
+      doc.roundedRect(M + W - prioW - 2, y+1, prioW, 5, 1, 1, 'FD');
+      doc.setTextColor(255,255,255); doc.setFontSize(6); doc.setFont('helvetica','bold');
+      doc.text(prio, M + W - prioW/2 - 2, y+4.3, { align: 'center' });
+
+      return y + 11;
+    }
+
+    function drawInfoGrid(y, d) {
+      const gridH = 8;
+      setF(doc, C_ALT); setD(doc, C_BORDA); doc.setLineWidth(0.15);
+      doc.rect(M, y, W, gridH, 'F'); doc.rect(M, y, W, gridH, 'S');
+
+      const colW = W / 4;
+      const labels = ['TAG', 'EQUIPE', 'TECNICO', 'OM'];
+      const vals = [d.tag||'—', d.equipe||'—', d.tecnico||'—', d.om||'—'];
+
+      setT(doc, C_TXT); doc.setFontSize(6); doc.setFont('helvetica','normal');
+      for (let i=0; i<4; i++) {
+        const labelText = labels[i] + ':  ';
+        const labelW = doc.getTextWidth(labelText);
+        setT(doc, C_TXT2); doc.setFont('helvetica','bold');
+        doc.text(labelText, M + i*colW + 2, y+3.5);
+        setT(doc, C_TXT); doc.setFont('helvetica','normal');
+        doc.text(vals[i].substring(0, 18), M + i*colW + 2 + labelW, y+3.5);
+      }
+
+      const labels2 = ['SITUACAO', 'PRIORIDADE', 'STATUS', 'SOLICITANTE'];
+      const sitCurta = d.situacao ? (d.situacao.split(' - ')[1] || d.situacao) : '—';
+      const vals2 = [sitCurta, d.prioridade||'—', d.status||'—', d.solicitante||'—'];
+
+      setT(doc, C_TXT); doc.setFontSize(6); doc.setFont('helvetica','normal');
+      for (let i=0; i<4; i++) {
+        const labelText = labels2[i] + ':  ';
+        const labelW = doc.getTextWidth(labelText);
+        setT(doc, C_TXT2); doc.setFont('helvetica','bold');
+        doc.text(labelText, M + i*colW + 2, y+6.5);
+        setT(doc, C_TXT); doc.setFont('helvetica','normal');
+        doc.text(vals2[i].substring(0, 18), M + i*colW + 2 + labelW, y+6.5);
+      }
+
+      return y + gridH + 2;
+    }
+
+    function drawFooter(pageNum, totalPages) {
+      setD(doc, C_BORDA); doc.setLineWidth(0.2);
+      doc.line(M, 290, M+W, 290);
+      setT(doc, C_TXT2); doc.setFontSize(5.5); doc.setFont('helvetica','normal');
+      doc.text(`Pagina ${pageNum} de ${totalPages}`, M, 294);
+      doc.text('Saneamento e SPCI — Gestao de Demandas', 75, 294);
+      doc.text(`Gerado em: ${new Date().toLocaleString('pt-BR')}`, 148, 294);
+    }
+
+    let currentPage = 1;
+    let y = 12;
+
+    drawGlobalHeader(currentPage, 1);
+    y = drawResumoCards(y);
+
+    function estimateDemandaHeight(d) {
+      let h = 11;
+      h += 18;
+      if (d.descricao) {
+        const lines = Math.ceil((d.descricao.length) / 85);
+        h += Math.max(lines * 2.8 + 5.5, 8) + 2;
+      }
+      if (d.analise) {
+        const lines = Math.ceil((d.analise.length) / 85);
+        h += Math.max(lines * 2.8 + 5.5, 8) + 2;
+      }
+      if (d.resolucao) {
+        const lines = Math.ceil((d.resolucao.length) / 85);
+        h += Math.max(lines * 2.8 + 5.5, 8) + 2;
+      }
+      if (d.comentarioPlan) {
+        const lines = Math.ceil((d.comentarioPlan.length) / 85);
+        h += Math.max(lines * 2.8 + 5.5, 8) + 2;
+      }
+      h += 3;
+      return h;
+    }
+
+    demandasParaRelatorio.forEach((d, idx) => {
+      const neededH = estimateDemandaHeight(d);
+
+      if (y + neededH > USABLE_H && idx > 0) {
+        drawFooter(currentPage, 1);
+        doc.addPage();
+        currentPage++;
+        y = 12;
+        setF(doc, C_ACCENT);
+        doc.rect(0, 0, 210, 7, 'F');
+        doc.setTextColor(255,255,255);
+        doc.setFontSize(7); doc.setFont('helvetica','bold');
+        doc.text('Relatorio Diario de Manutencoes — Saneamento e SPCI', M, 4.5);
+      }
+
+      if (idx > 0 && y > 30) {
+        setD(doc, '#e0e0e0'); doc.setLineWidth(0.3);
+        doc.line(M, y-1, M+W, y-1);
+      }
+
+      y = drawDemandaHeader(y, d, idx, demandasParaRelatorio.length);
+      y = drawInfoGrid(y, d);
+      y = addSecCompact(y, 'Demanda', d.descricao);
+      y = addSecCompact(y, 'Analise', d.analise);
+      y = addSecCompact(y, 'Resolução', d.resolucao);
+      y = addSecCompact(y, 'Comentario do Planejamento', d.comentarioPlan);
+      y += 2;
+    });
+
+    drawFooter(currentPage, currentPage);
+
+    doc.setPage(1);
+    drawGlobalHeader(1, currentPage);
+
+    for (let i = 2; i <= currentPage; i++) {
+      doc.setPage(i);
+      setF(doc, C_ACCENT);
+      doc.rect(0, 0, 210, 7, 'F');
+      doc.setTextColor(255,255,255);
+      doc.setFontSize(7); doc.setFont('helvetica','bold');
+      doc.text('Relatorio Diario de Manutencoes — Saneamento e SPCI', M, 4.5);
+      doc.setFontSize(5.5); doc.setFont('helvetica','normal');
+      doc.text(`Pag. ${i}/${currentPage}`, 170, 4.5);
+    }
+
+    for (let i = 1; i <= currentPage; i++) {
+      doc.setPage(i);
+      drawFooter(i, currentPage);
+    }
+
+    doc.save(`Relatorio_Manutencoes_${dataRel || 'todas'}.pdf`);
+    toast('PDF exportado com sucesso!', 'success');
+  } catch(e) {
+    console.error('Erro ao gerar PDF:', e);
+    toast('Erro ao gerar PDF: ' + e.message, 'error');
+  } finally {
+    mostrarLoading(false);
+  }
+}
+
 
 // ---- Init ----
 async function init() {

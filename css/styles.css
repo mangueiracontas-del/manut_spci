@@ -394,3 +394,84 @@ tbody tr:hover td{background:var(--bg3);cursor:pointer}
   .filter-bar .search-box{width:100%}
   .form-row{grid-template-columns:1fr}
 }
+
+/* ============================================================
+   RELATÓRIO DIÁRIO DE MANUTENÇÕES
+   ============================================================ */
+
+/* Ajustes específicos para a tabela do relatório */
+#page-relatorio .table-wrap {
+  margin-top: 0;
+}
+
+/* Stats do relatório com cores específicas */
+#relatorio-stats .stat-card {
+  border-left: 3px solid var(--border);
+}
+
+#relatorio-stats .stat-card:nth-child(1) {
+  border-left-color: var(--blue);
+}
+
+#relatorio-stats .stat-card:nth-child(2) {
+  border-left-color: var(--red);
+}
+
+#relatorio-stats .stat-card:nth-child(3) {
+  border-left-color: var(--orange);
+}
+
+#relatorio-stats .stat-card:nth-child(4) {
+  border-left-color: var(--yellow);
+}
+
+#relatorio-stats .stat-card:nth-child(5) {
+  border-left-color: var(--green);
+}
+
+/* Hover na tabela do relatório */
+#relatorio-tbody tr:hover td {
+  background: var(--bg3);
+  cursor: pointer;
+}
+
+/* Ajuste de largura das colunas do relatório */
+#relatorio-tbody td:nth-child(1) {
+  white-space: nowrap;
+}
+
+#relatorio-tbody td:nth-child(6) {
+  white-space: nowrap;
+}
+
+/* Print styles para PDF */
+@media print {
+  .topbar,
+  .page-header-actions,
+  .filter-bar,
+  #relatorio-stats,
+  .empty-state {
+    display: none !important;
+  }
+
+  .page {
+    display: none !important;
+  }
+
+  #page-relatorio.page.active {
+    display: block !important;
+  }
+
+  .table-wrap {
+    border: 1px solid #ddd;
+  }
+
+  th {
+    background: #f5f5f5 !important;
+    color: #333 !important;
+  }
+
+  td {
+    color: #333 !important;
+  }
+}

@@ -72,12 +72,14 @@ function updateNavVisibility() {
   const navSites = document.getElementById('nav-sites');
   const navLocais = document.getElementById('nav-locais');
   const navUsuarios = document.getElementById('nav-usuarios');
+  const navRelatorio = document.getElementById('nav-relatorio');
 
   const isAdmin = currentUser && currentUser.tipo === 'admin';
 
   if (navSites) navSites.style.display = isAdmin ? 'flex' : 'none';
   if (navLocais) navLocais.style.display = isAdmin ? 'flex' : 'none';
   if (navUsuarios) navUsuarios.style.display = isAdmin ? 'flex' : 'none';
+  if (navRelatorio) navRelatorio.style.display = isRelatorioAccess() ? 'flex' : 'none';
 }
 
 function isAdmin() {
@@ -91,6 +93,11 @@ function isPlanejamento() {
 function isManutencao() {
   return currentUser && (currentUser.role === 'manutencao' || currentUser.tipo === 'admin');
 }
+
+function isRelatorioAccess() {
+  return currentUser && (currentUser.role === 'manutencao' || currentUser.role === 'planejamento' || currentUser.tipo === 'admin');
+}
+
 
 // ---- UI de login ----
 function renderLoginForm() {
