@@ -1396,10 +1396,11 @@ async function gerarRelatorioPDF() {
     }
 
     function drawResumoCards(y) {
-      const criticos = demandasParaRelatorio.filter(x => x.situacao?.includes('Critico')).length;
-      const prioritarios = demandasParaRelatorio.filter(x => x.situacao?.includes('Prioritario')).length;
-      const moderados = demandasParaRelatorio.filter(x => x.situacao?.includes('Moderado')).length;
-      const leves = demandasParaRelatorio.filter(x => x.situacao?.includes('Leve')).length;
+      function norm(s) { return s ? s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase() : ''; }
+      const criticos = demandasParaRelatorio.filter(x => norm(x.situacao).includes('critico')).length;
+      const prioritarios = demandasParaRelatorio.filter(x => norm(x.situacao).includes('prioritario')).length;
+      const moderados = demandasParaRelatorio.filter(x => norm(x.situacao).includes('moderado')).length;
+      const leves = demandasParaRelatorio.filter(x => norm(x.situacao).includes('leve')).length;
 
       const cards = [
         { l:'Total', v:demandasParaRelatorio.length, c:C_ACCENT },
@@ -1409,17 +1410,17 @@ async function gerarRelatorioPDF() {
         { l:'Leves', v:leves, c:C_GREEN }
       ];
 
-      const cw = 37, ch = 7;
+      const cw = 37, ch = 6.5;
       let cx = M;
       cards.forEach(cd => {
         setD(doc, C_BORDA); doc.setLineWidth(0.15);
-        doc.roundedRect(cx, y, cw, ch, 0.8, 0.8, 'S');
+        doc.roundedRect(cx, y, cw, ch, 0.6, 0.6, 'S');
         const [cr,cg,cb] = hexRgb(cd.c);
-        doc.setFillColor(cr,cg,cb); doc.rect(cx, y, cw, 1.2, 'F');
-        setT(doc, C_TXT); doc.setFontSize(9); doc.setFont('helvetica','bold');
-        doc.text(String(cd.v), cx + 2, y + 4.5);
+        doc.setFillColor(cr,cg,cb); doc.rect(cx, y, cw, 1, 'F');
         setT(doc, C_TXT2); doc.setFontSize(7); doc.setFont('helvetica','normal');
-        doc.text(cd.l, cx + 2, y + 6.2);
+        doc.text(cd.l + ':', cx + 2, y + 4.2);
+        setT(doc, C_TXT); doc.setFontSize(10); doc.setFont('helvetica','bold');
+        doc.text(String(cd.v), cx + cw - 2, y + 4.2, { align: 'right' });
         cx += cw + 2;
       });
       return y + ch + 1.5;
@@ -1439,7 +1440,7 @@ async function gerarRelatorioPDF() {
       setF(doc, '#fafafa'); setD(doc, '#dddddd'); doc.setLineWidth(0.1);
       doc.rect(M, y, W, h, 'F'); doc.rect(M, y, W, h, 'S');
       setT(doc, C_TXT); doc.setFontSize(9); doc.setFont('helvetica','normal');
-      doc.text(texto, M + 2.5, y + 3, { align: 'justify', maxWidth: maxW, lineHeightFactor: 1.1 });
+      doc.text(linhas, M + 2.5, y + 3, { align: 'left', lineHeightFactor: 1.1 });
       return y + h + 1.5;
     }
 
