@@ -1378,20 +1378,21 @@ async function gerarRelatorioPDF() {
     function setF(doc, hex) { const [r,g,b]=hexRgb(hex); doc.setFillColor(r,g,b); }
     function setD(doc, hex) { const [r,g,b]=hexRgb(hex); doc.setDrawColor(r,g,b); }
 
-    const M = 10;
-    const W = 190;
+    const M = 6;
+    const W = 198;
     const PAGE_H = 297;
-    const FOOTER_H = 8;
-    const USABLE_H = PAGE_H - M - FOOTER_H;
+    const FOOTER_H = 5;
+    const ASSIN_H = 14;
+    const USABLE_H = PAGE_H - M - FOOTER_H - ASSIN_H;
 
     function drawGlobalHeader(pageNum, totalPages) {
       setF(doc, C_ACCENT);
-      doc.rect(0, 0, 210, 10, 'F');
+      doc.rect(0, 0, 210, 5, 'F');
       doc.setTextColor(255,255,255);
-      doc.setFontSize(8); doc.setFont('helvetica','bold');
-      doc.text('Relatorio Diario de Manutencoes — Saneamento e SPCI', M, 5.5);
-      doc.setFontSize(6); doc.setFont('helvetica','normal');
-      doc.text(`Data: ${dataFormatada}  |  Total: ${demandasParaRelatorio.length} manut.  |  Pag. ${pageNum}/${totalPages}`, 140, 5.5);
+      doc.setFontSize(6); doc.setFont('helvetica','bold');
+      doc.text('Relatorio Diario de Manutencoes — Saneamento e SPCI', M, 3.5);
+      doc.setFontSize(5.5); doc.setFont('helvetica','normal');
+      doc.text(`Data: ${dataFormatada}  |  Total: ${demandasParaRelatorio.length} manut.  |  Pag. ${pageNum}/${totalPages}`, 145, 3.5);
     }
 
     function drawResumoCards(y) {
@@ -1408,34 +1409,37 @@ async function gerarRelatorioPDF() {
         { l:'Leves', v:leves, c:C_GREEN }
       ];
 
-      const cw = 34, ch = 12;
+      const cw = 37, ch = 7;
       let cx = M;
       cards.forEach(cd => {
-        setD(doc, C_BORDA); doc.setLineWidth(0.25);
-        doc.roundedRect(cx, y, cw, ch, 1.5, 1.5, 'S');
+        setD(doc, C_BORDA); doc.setLineWidth(0.15);
+        doc.roundedRect(cx, y, cw, ch, 0.8, 0.8, 'S');
         const [cr,cg,cb] = hexRgb(cd.c);
-        doc.setFillColor(cr,cg,cb); doc.rect(cx, y, cw, 2, 'F');
-        setT(doc, C_TXT); doc.setFontSize(11); doc.setFont('helvetica','bold');
-        doc.text(String(cd.v), cx + 2.5, y + 8);
-        setT(doc, C_TXT2); doc.setFontSize(6); doc.setFont('helvetica','normal');
-        doc.text(cd.l, cx + 2.5, y + 10.5);
-        cx += cw + 3;
+        doc.setFillColor(cr,cg,cb); doc.rect(cx, y, cw, 1.2, 'F');
+        setT(doc, C_TXT); doc.setFontSize(9); doc.setFont('helvetica','bold');
+        doc.text(String(cd.v), cx + 2, y + 4.5);
+        setT(doc, C_TXT2); doc.setFontSize(7); doc.setFont('helvetica','normal');
+        doc.text(cd.l, cx + 2, y + 6.2);
+        cx += cw + 2;
       });
-      return y + ch + 3;
+      return y + ch + 1.5;
     }
 
     function addSecCompact(y, titulo, texto) {
       if (!texto || !texto.trim()) return y;
-      const linhas = doc.splitTextToSize(texto, W - 5);
-      const h = Math.max(linhas.length * 2.6 + 4, 6.5);
+      y += 2;
+      const maxW = W - 10;
+      const linhas = doc.splitTextToSize(texto, maxW);
+      const lineH = 3.5;
+      const h = Math.max(linhas.length * lineH + 5, 8);
 
-      setT(doc, C_ACCENT); doc.setFontSize(6); doc.setFont('helvetica','bold');
+      setT(doc, C_ACCENT); doc.setFontSize(7); doc.setFont('helvetica','bold');
       doc.text(titulo.toUpperCase(), M, y);
-      y += 1.5;
-      setF(doc, '#fafafa'); setD(doc, '#dddddd'); doc.setLineWidth(0.12);
+      y += 2.2;
+      setF(doc, '#fafafa'); setD(doc, '#dddddd'); doc.setLineWidth(0.1);
       doc.rect(M, y, W, h, 'F'); doc.rect(M, y, W, h, 'S');
-      setT(doc, C_TXT); doc.setFontSize(6.5); doc.setFont('helvetica','normal');
-      doc.text(linhas, M+2, y+2.5);
+      setT(doc, C_TXT); doc.setFontSize(9); doc.setFont('helvetica','normal');
+      doc.text(texto, M + 2.5, y + 3, { align: 'justify', maxWidth: maxW, lineHeightFactor: 1.1 });
       return y + h + 1.5;
     }
 
@@ -1444,99 +1448,118 @@ async function gerarRelatorioPDF() {
                        d.situacao?.includes('Prioritario') ? C_ORANGE :
                        d.situacao?.includes('Moderado') ? C_YELLOW : C_GREEN;
       const [cr,cg,cb] = hexRgb(sitColor);
-      doc.setFillColor(cr,cg,cb); doc.rect(M, y, 2, 18, 'F');
+      doc.setFillColor(cr,cg,cb); doc.rect(M, y, 1.2, 9, 'F');
 
       setT(doc, C_TXT); doc.setFontSize(10); doc.setFont('helvetica','bold');
-      doc.text(`${d.id}`, M+5, y+4.5);
-      setT(doc, C_TXT2); doc.setFontSize(6.5); doc.setFont('helvetica','normal');
-      doc.text(`${idx+1}/${total}  |  Concluida: ${formatDate(d.dataConclusao)}  |  Site: ${d.site||'—'}  |  Local: ${d.local||'—'}`, M+5, y+8);
+      doc.text(`${d.id}`, M+3, y+3);
+      setT(doc, C_TXT2); doc.setFontSize(7); doc.setFont('helvetica','normal');
+      doc.text(`${idx+1}/${total}  |  Concluida: ${formatDate(d.dataConclusao)}  |  Site: ${d.site||'—'}  |  Local: ${d.local||'—'}`, M+3, y+5.5);
 
       const prio = d.prioridade || '—';
-      const prioW = doc.getTextWidth(prio) + 6;
+      const prioW = doc.getTextWidth(prio) + 4;
       const prioColor = d.prioridade === 'P0' ? '#2D0A0A' :
                         d.prioridade === 'P1' ? C_RED :
                         d.prioridade === 'P2' ? C_ORANGE :
                         d.prioridade === 'P3' ? C_YELLOW : '#666';
       const [pr,pg,pb] = hexRgb(prioColor);
       doc.setFillColor(pr,pg,pb); doc.setDrawColor(pr,pg,pb);
-      doc.roundedRect(M + W - prioW - 2, y+1, prioW, 5, 1, 1, 'FD');
-      doc.setTextColor(255,255,255); doc.setFontSize(6); doc.setFont('helvetica','bold');
-      doc.text(prio, M + W - prioW/2 - 2, y+4.3, { align: 'center' });
+      doc.roundedRect(M + W - prioW - 1, y+0.5, prioW, 3.2, 0.6, 0.6, 'FD');
+      doc.setTextColor(255,255,255); doc.setFontSize(7); doc.setFont('helvetica','bold');
+      doc.text(prio, M + W - prioW/2 - 1, y+2.7, { align: 'center' });
 
-      return y + 11;
+      return y + 7.5;
     }
 
     function drawInfoGrid(y, d) {
       const gridH = 8;
-      setF(doc, C_ALT); setD(doc, C_BORDA); doc.setLineWidth(0.15);
+      setF(doc, C_ALT); setD(doc, C_BORDA); doc.setLineWidth(0.1);
       doc.rect(M, y, W, gridH, 'F'); doc.rect(M, y, W, gridH, 'S');
 
       const colW = W / 4;
       const labels = ['TAG', 'EQUIPE', 'TECNICO', 'OM'];
       const vals = [d.tag||'—', d.equipe||'—', d.tecnico||'—', d.om||'—'];
 
-      setT(doc, C_TXT); doc.setFontSize(6); doc.setFont('helvetica','normal');
+      setT(doc, C_TXT); doc.setFontSize(7); doc.setFont('helvetica','normal');
       for (let i=0; i<4; i++) {
-        const labelText = labels[i] + ':  ';
+        const labelText = labels[i] + ': ';
         const labelW = doc.getTextWidth(labelText);
         setT(doc, C_TXT2); doc.setFont('helvetica','bold');
-        doc.text(labelText, M + i*colW + 2, y+3.5);
+        doc.text(labelText, M + i*colW + 1.5, y+2.8);
         setT(doc, C_TXT); doc.setFont('helvetica','normal');
-        doc.text(vals[i].substring(0, 18), M + i*colW + 2 + labelW, y+3.5);
+        doc.text(vals[i].substring(0, 18), M + i*colW + 1.5 + labelW, y+2.8);
       }
 
       const labels2 = ['SITUACAO', 'PRIORIDADE', 'STATUS', 'SOLICITANTE'];
       const sitCurta = d.situacao ? (d.situacao.split(' - ')[1] || d.situacao) : '—';
       const vals2 = [sitCurta, d.prioridade||'—', d.status||'—', d.solicitante||'—'];
 
-      setT(doc, C_TXT); doc.setFontSize(6); doc.setFont('helvetica','normal');
+      setT(doc, C_TXT); doc.setFontSize(7); doc.setFont('helvetica','normal');
       for (let i=0; i<4; i++) {
-        const labelText = labels2[i] + ':  ';
+        const labelText = labels2[i] + ': ';
         const labelW = doc.getTextWidth(labelText);
         setT(doc, C_TXT2); doc.setFont('helvetica','bold');
-        doc.text(labelText, M + i*colW + 2, y+6.5);
+        doc.text(labelText, M + i*colW + 1.5, y+5.2);
         setT(doc, C_TXT); doc.setFont('helvetica','normal');
-        doc.text(vals2[i].substring(0, 18), M + i*colW + 2 + labelW, y+6.5);
+        doc.text(vals2[i].substring(0, 18), M + i*colW + 1.5 + labelW, y+5.2);
       }
 
-      return y + gridH + 2;
+      return y + gridH + 1;
+    }
+
+
+    function drawAssinaturas(y) {
+      const terco = (W - 16) / 3;
+      const gap = 8;
+      const linhaY = y + 8;
+
+      setD(doc, C_TXT); doc.setLineWidth(0.25);
+      doc.line(M, linhaY, M + terco, linhaY);
+      doc.line(M + terco + gap, linhaY, M + terco*2 + gap, linhaY);
+      doc.line(M + terco*2 + gap*2, linhaY, M + W, linhaY);
+
+      setT(doc, C_TXT); doc.setFontSize(8); doc.setFont('helvetica','normal');
+      doc.text('Técnico 1', M + terco/2, linhaY + 3.5, { align: 'center' });
+      doc.text('Técnico 2', M + terco + gap + terco/2, linhaY + 3.5, { align: 'center' });
+      doc.text('Encarregado', M + terco*2 + gap*2 + terco/2, linhaY + 3.5, { align: 'center' });
+
+      return linhaY + 6;
     }
 
     function drawFooter(pageNum, totalPages) {
-      setD(doc, C_BORDA); doc.setLineWidth(0.2);
-      doc.line(M, 290, M+W, 290);
-      setT(doc, C_TXT2); doc.setFontSize(5.5); doc.setFont('helvetica','normal');
-      doc.text(`Pagina ${pageNum} de ${totalPages}`, M, 294);
-      doc.text('Saneamento e SPCI — Gestao de Demandas', 75, 294);
-      doc.text(`Gerado em: ${new Date().toLocaleString('pt-BR')}`, 148, 294);
+      setD(doc, C_BORDA); doc.setLineWidth(0.12);
+      doc.line(M, 293, M+W, 293);
+      setT(doc, C_TXT2); doc.setFontSize(6.5); doc.setFont('helvetica','normal');
+      doc.text(`Pagina ${pageNum} de ${totalPages}`, M, 295.5);
+      doc.text('Saneamento e SPCI — Gestao de Demandas', 78, 295.5);
+      doc.text(`Gerado em: ${new Date().toLocaleString('pt-BR')}`, 152, 295.5);
     }
 
     let currentPage = 1;
-    let y = 12;
+    let y = 9;
 
     drawGlobalHeader(currentPage, 1);
     y = drawResumoCards(y);
 
     function estimateDemandaHeight(d) {
-      let h = 11;
-      h += 18;
+      let h = 7.5;      // header
+      h += 9;           // info grid + gap
       if (d.descricao) {
-        const lines = Math.ceil((d.descricao.length) / 85);
-        h += Math.max(lines * 2.8 + 5.5, 8) + 2;
+        const lines = Math.ceil((d.descricao.length) / 110);
+        h += Math.max(lines * 3.6 + 5, 8) + 5.7;
       }
       if (d.analise) {
-        const lines = Math.ceil((d.analise.length) / 85);
-        h += Math.max(lines * 2.8 + 5.5, 8) + 2;
+        const lines = Math.ceil((d.analise.length) / 110);
+        h += Math.max(lines * 3.6 + 5, 8) + 5.7;
       }
       if (d.resolucao) {
-        const lines = Math.ceil((d.resolucao.length) / 85);
-        h += Math.max(lines * 2.8 + 5.5, 8) + 2;
+        const lines = Math.ceil((d.resolucao.length) / 110);
+        h += Math.max(lines * 3.6 + 5, 8) + 5.7;
       }
       if (d.comentarioPlan) {
-        const lines = Math.ceil((d.comentarioPlan.length) / 85);
-        h += Math.max(lines * 2.8 + 5.5, 8) + 2;
+        const lines = Math.ceil((d.comentarioPlan.length) / 110);
+        h += Math.max(lines * 3.6 + 5, 8) + 5.7;
       }
-      h += 3;
+      h += 1.5;
       return h;
     }
 
@@ -1544,31 +1567,33 @@ async function gerarRelatorioPDF() {
       const neededH = estimateDemandaHeight(d);
 
       if (y + neededH > USABLE_H && idx > 0) {
+        drawAssinaturas(USABLE_H + M);
         drawFooter(currentPage, 1);
         doc.addPage();
         currentPage++;
-        y = 12;
+        y = 8;
         setF(doc, C_ACCENT);
-        doc.rect(0, 0, 210, 7, 'F');
+        doc.rect(0, 0, 210, 5, 'F');
         doc.setTextColor(255,255,255);
-        doc.setFontSize(7); doc.setFont('helvetica','bold');
-        doc.text('Relatorio Diario de Manutencoes — Saneamento e SPCI', M, 4.5);
+        doc.setFontSize(6); doc.setFont('helvetica','bold');
+        doc.text('Relatorio Diario de Manutencoes — Saneamento e SPCI', M, 3.5);
       }
 
-      if (idx > 0 && y > 30) {
-        setD(doc, '#e0e0e0'); doc.setLineWidth(0.3);
-        doc.line(M, y-1, M+W, y-1);
+      if (idx > 0 && y > 20) {
+        setD(doc, '#e0e0e0'); doc.setLineWidth(0.15);
+        doc.line(M, y-0.6, M+W, y-0.6);
       }
 
       y = drawDemandaHeader(y, d, idx, demandasParaRelatorio.length);
       y = drawInfoGrid(y, d);
       y = addSecCompact(y, 'Demanda', d.descricao);
       y = addSecCompact(y, 'Analise', d.analise);
-      y = addSecCompact(y, 'Resolução', d.resolucao);
+      y = addSecCompact(y, 'Resolucao', d.resolucao);
       y = addSecCompact(y, 'Comentario do Planejamento', d.comentarioPlan);
-      y += 2;
+      y += 1;
     });
 
+    drawAssinaturas(USABLE_H + M);
     drawFooter(currentPage, currentPage);
 
     doc.setPage(1);
@@ -1577,12 +1602,12 @@ async function gerarRelatorioPDF() {
     for (let i = 2; i <= currentPage; i++) {
       doc.setPage(i);
       setF(doc, C_ACCENT);
-      doc.rect(0, 0, 210, 7, 'F');
+      doc.rect(0, 0, 210, 5, 'F');
       doc.setTextColor(255,255,255);
-      doc.setFontSize(7); doc.setFont('helvetica','bold');
-      doc.text('Relatorio Diario de Manutencoes — Saneamento e SPCI', M, 4.5);
+      doc.setFontSize(6); doc.setFont('helvetica','bold');
+      doc.text('Relatorio Diario de Manutencoes — Saneamento e SPCI', M, 3.5);
       doc.setFontSize(5.5); doc.setFont('helvetica','normal');
-      doc.text(`Pag. ${i}/${currentPage}`, 170, 4.5);
+      doc.text(`Pag. ${i}/${currentPage}`, 170, 3.5);
     }
 
     for (let i = 1; i <= currentPage; i++) {
