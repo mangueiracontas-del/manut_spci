@@ -1186,25 +1186,35 @@ function formatDate(d)    { if(!d) return '—'; if(d.includes('/')) return d; c
 function formatDateTime(dt){ if(!dt) return '—'; const d=new Date(dt); return d.toLocaleDateString('pt-BR')+' '+d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}); }
 function calcularTempoVida(d) {
   if (!d.data) return '—';
-  
-  // Parse a data como componentes YYYY-MM-DD para evitar problemas de timezone
-  const [ano, mes, dia] = d.data.split('-').map(Number);
-  
-  // Cria datas em UTC para evitar qualquer interferência de timezone local
+
+  // Parse da data: suporta DD/MM/AAAA (novo) e YYYY-MM-DD (cache antigo)
+  let dia, mes, ano;
+  if (d.data.includes('/')) {
+    [dia, mes, ano] = d.data.split('/').map(Number);
+  } else {
+    [ano, mes, dia] = d.data.split('-').map(Number);
+  }
+
   const dataCadastro = Date.UTC(ano, mes - 1, dia);
-  
+
   let dataFimMs;
   if (d.status === 'Concluída' && d.dataConclusao) {
-    const [anoF, mesF, diaF] = d.dataConclusao.split('-').map(Number);
+    let diaF, mesF, anoF;
+    if (d.dataConclusao.includes('/')) {
+      [diaF, mesF, anoF] = d.dataConclusao.split('/').map(Number);
+    } else {
+      [anoF, mesF, diaF] = d.dataConclusao.split('-').map(Number);
+    }
     dataFimMs = Date.UTC(anoF, mesF - 1, diaF);
   } else {
     const hoje = new Date();
     dataFimMs = Date.UTC(hoje.getFullYear(), hoje.getMonth(), hoje.getDate());
   }
-  
+
   const diffMs = dataFimMs - dataCadastro;
   const diffDias = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-  
+
+  if (isNaN(diffDias)) return '—';
   if (diffDias < 0) return '0 dias';
   if (diffDias === 0) return '< 1 dia';
   if (diffDias === 1) return '1 dia';
