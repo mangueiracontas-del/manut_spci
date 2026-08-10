@@ -6,7 +6,7 @@
 -- 1. TABELA PRINCIPAL DE DEMANDAS
 CREATE TABLE IF NOT EXISTS demandas (
   id            TEXT PRIMARY KEY,
-  data          DATE NOT NULL,
+  data          TEXT NOT NULL,  -- formato DD/MM/AAAA
   data_hora     TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   site          TEXT NOT NULL,
   local         TEXT NOT NULL,
@@ -23,8 +23,8 @@ CREATE TABLE IF NOT EXISTS demandas (
   resolucao     TEXT,
   om            TEXT,
   tecnico       TEXT,
-  data_aceite   DATE,
-  data_conclusao DATE,
+  data_aceite   TEXT,  -- formato DD/MM/AAAA
+  data_conclusao TEXT,  -- formato DD/MM/AAAA
   created_at    TIMESTAMPTZ DEFAULT NOW(),
   updated_at    TIMESTAMPTZ DEFAULT NOW()
 );
@@ -84,9 +84,9 @@ CREATE POLICY "config_all_public"
 -- 6. DADOS DE EXEMPLO (opcional — remova se não quiser)
 INSERT INTO demandas (id,data,data_hora,site,local,tag,solicitante,situacao,descricao,status,prioridade,equipe,comentario_plan,analise,resolucao,om,tecnico,data_aceite,data_conclusao)
 VALUES
-  ('DM-202506-1001','2025-06-01','2025-06-01T08:30:00Z','ETE Norte','Blower A — Sala 01','BLW-001','Carlos Andrade','Sistema parado - Crítico','Blower A não liga após falha elétrica. Alarme no painel indicando sobrecorrente.','Em Andamento','P1','Manutenção Corretiva','Verificar capacitores e disjuntores antes de qualquer intervenção.','Capacitor do motor queimado.','Troca do capacitor 40µF. Motor religado e testado.','OM-2025-0041','João Silva','2025-06-01',NULL),
-  ('DM-202506-1002','2025-06-03','2025-06-03T10:15:00Z','ETE Sul','Decantador 02','DEC-002','Maria Santos','Sistema com Restrição - Moderado','Raspador do decantador com ruído anormal. Vibração excessiva.','Em Análise','P3','Inspeção',NULL,NULL,NULL,NULL,NULL,'2025-06-03',NULL),
-  ('DM-202506-1003','2025-06-05','2025-06-05T14:00:00Z','ETE Norte','Bomba de Recirculação','BBA-003','Pedro Lima','Sistema parcialmente parado - Prioritário','Bomba com vazamento no selo mecânico. Operando com 50% da capacidade.','Aberta',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
-  ('DM-202505-1004','2025-05-20','2025-05-20T09:00:00Z','SPCI Oeste','Painel Elétrico Principal','PAI-001','Ana Costa','Sistema operando - Leve','Disjuntor do quadro 03 disparando intermitentemente sem carga.','Concluída','P2','Manutenção Corretiva','Urgente — pode causar parada geral.','Disjuntor com defeito interno.','Substituição do disjuntor 32A.','OM-2025-0038','Roberto Mendes','2025-05-20','2025-05-22'),
-  ('DM-202506-1005','2025-06-10','2025-06-10T07:45:00Z','ETE Sul','Filtro Biológico 01','FIL-001','Carlos Andrade','Sistema parado - Crítico','Motor do distribuidor do filtro biológico queimado. Sistema parado.','Em Andamento','P0','Manutenção Corretiva','URGENTE — acionar supervisor imediatamente.',NULL,NULL,'OM-2025-0045','João Silva','2025-06-10',NULL)
+  ('DM-202506-1001','01/06/2025','2025-06-01T08:30:00Z','ETE Norte','Blower A — Sala 01','BLW-001','Carlos Andrade','Sistema parado - Crítico','Blower A não liga após falha elétrica. Alarme no painel indicando sobrecorrente.','Em Andamento','P1','Manutenção Corretiva','Verificar capacitores e disjuntores antes de qualquer intervenção.','Capacitor do motor queimado.','Troca do capacitor 40µF. Motor religado e testado.','OM-2025-0041','João Silva','01/06/2025',NULL),
+  ('DM-202506-1002','03/06/2025','2025-06-03T10:15:00Z','ETE Sul','Decantador 02','DEC-002','Maria Santos','Sistema com Restrição - Moderado','Raspador do decantador com ruído anormal. Vibração excessiva.','Em Análise','P3','Inspeção',NULL,NULL,NULL,NULL,NULL,'03/06/2025',NULL),
+  ('DM-202506-1003','05/06/2025','2025-06-05T14:00:00Z','ETE Norte','Bomba de Recirculação','BBA-003','Pedro Lima','Sistema parcialmente parado - Prioritário','Bomba com vazamento no selo mecânico. Operando com 50% da capacidade.','Aberta',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
+  ('DM-202505-1004','20/05/2025','2025-05-20T09:00:00Z','SPCI Oeste','Painel Elétrico Principal','PAI-001','Ana Costa','Sistema operando - Leve','Disjuntor do quadro 03 disparando intermitentemente sem carga.','Concluída','P2','Manutenção Corretiva','Urgente — pode causar parada geral.','Disjuntor com defeito interno.','Substituição do disjuntor 32A.','OM-2025-0038','Roberto Mendes','20/05/2025','2025-05-22'),
+  ('DM-202506-1005','10/06/2025','2025-06-10T07:45:00Z','ETE Sul','Filtro Biológico 01','FIL-001','Carlos Andrade','Sistema parado - Crítico','Motor do distribuidor do filtro biológico queimado. Sistema parado.','Em Andamento','P0','Manutenção Corretiva','URGENTE — acionar supervisor imediatamente.',NULL,NULL,'OM-2025-0045','João Silva','10/06/2025',NULL)
 ON CONFLICT (id) DO NOTHING;

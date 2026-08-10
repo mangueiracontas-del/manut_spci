@@ -1,6 +1,7 @@
 // ============================================================
 // SANEAMENTO E SPCI — Camada de Dados
 // Supabase (online) + IndexedDB (offline fallback)
+// Datas armazenadas em formato DD/MM/AAAA (TEXT no banco)
 // ============================================================
 
 // ---- IndexedDB (cache offline) ----

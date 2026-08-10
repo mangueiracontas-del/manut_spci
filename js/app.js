@@ -34,12 +34,33 @@ function gerarIDUsuario() {
   return 'USR-' + d.getFullYear() + String(d.getMonth() + 1).padStart(2, '0') + '-' + Math.floor(100 + Math.random() * 900);
 }
 
+// ---- Utilitários de data (DD/MM/AAAA) ----
+function hojeBR() {
+  const d = new Date();
+  return String(d.getDate()).padStart(2, '0') + '/' + String(d.getMonth() + 1).padStart(2, '0') + '/' + d.getFullYear();
+}
+
+function toISODate(brDate) {
+  // Converte DD/MM/AAAA → AAAA-MM-DD para comparações internas
+  if (!brDate || brDate === '—') return '';
+  if (brDate.includes('-')) return brDate; // já está em ISO
+  const [dd, mm, yyyy] = brDate.split('/');
+  return yyyy + '-' + mm + '-' + dd;
+}
+
+function fromISODate(isoDate) {
+  // Converte AAAA-MM-DD → DD/MM/AAAA
+  if (!isoDate) return '';
+  const [y, m, dd] = isoDate.split('-');
+  return dd + '/' + m + '/' + y;
+}
+
 // ---- Carregar ----
 async function loadDemandas() {
   mostrarLoading(true);
   try {
     allDemandas = await dbCarregarDemandas();
-    allDemandas.sort((a, b) => new Date(b.data) - new Date(a.data));
+    allDemandas.sort((a, b) => new Date(toISODate(b.data)) - new Date(toISODate(a.data)));
     console.log('[APP] Demandas carregadas:', allDemandas.length);
   } catch(e) {
     console.error('[APP] Erro ao carregar demandas:', e);
@@ -105,8 +126,8 @@ function popularFiltros() {
 
 function aplicarFiltros() {
   const busca    = document.getElementById('f-busca').value.toLowerCase();
-  const dIni     = document.getElementById('f-data-ini').value;
-  const dFim     = document.getElementById('f-data-fim').value;
+  const dIni     = document.getElementById('f-data-ini').value;  // YYYY-MM-DD do input
+  const dFim     = document.getElementById('f-data-fim').value;    // YYYY-MM-DD do input
   const site     = document.getElementById('f-site').value;
   const local    = document.getElementById('f-local').value;
   const situacao = document.getElementById('f-situacao').value;
@@ -119,8 +140,9 @@ function aplicarFiltros() {
   filteredDemandas = allDemandas.filter(d => {
     const st = d.status || 'Aberta';
     if (busca && ![d.site,d.tag,d.local,d.descricao,d.solicitante,d.om].some(v => (v||'').toLowerCase().includes(busca))) return false;
-    if (dIni && d.data < dIni) return false;
-    if (dFim && d.data > dFim) return false;
+    const dDataISO = toISODate(d.data);
+    if (dIni && dDataISO < dIni) return false;
+    if (dFim && dDataISO > dFim) return false;
     if (site && d.site !== site) return false;
     if (local && d.local !== local) return false;
     if (situacao && d.situacao !== situacao) return false;
@@ -139,7 +161,8 @@ function aplicarFiltros() {
       if (statusDiff !== 0) return statusDiff;
       const prioDiff = (pd[a.prioridade] ?? 99) - (pd[b.prioridade] ?? 99);
       if (prioDiff !== 0) return prioDiff;
-      return new Date(b.data) - new Date(a.data);
+      // Compara datas DD/MM/AAAA convertendo para ISO
+      return new Date(toISODate(b.data)) - new Date(toISODate(a.data));
   });
   renderDemandasTable();
   renderStats();
@@ -463,11 +486,11 @@ async function submitNovaDemanda() {
   const statusInicial = isMan ? 'Em Análise' : (equipe ? 'Em Análise' : 'Aberta');
 
   const d = {
-    id: gerarID(), data: new Date().toISOString().split('T')[0], dataHora: new Date().toISOString(),
+    id: gerarID(), data: hojeBR(), dataHora: new Date().toISOString(),
     site, local, tag, solicitante, situacao, descricao,
     status: statusInicial, prioridade, equipe,
     comentarioPlan: null, analise: null, resolucao: null, om: null,
-    dataAceite: equipe ? new Date().toISOString().split('T')[0] : null,
+    dataAceite: equipe ? hojeBR() : null,
     dataConclusao: null, tecnico: null
   };
 
@@ -910,7 +933,7 @@ async function confirmarAceite(perfil) {
     d.tecnico = document.getElementById('ac-tecnico').value.trim() || null;
     d.status  = 'Em Andamento';
   }
-  d.dataAceite = d.dataAceite || new Date().toISOString().split('T')[0];
+  d.dataAceite = d.dataAceite || hojeBR();
   mostrarLoading(true);
   try {
     await dbSalvarDemanda(d);
@@ -957,7 +980,7 @@ async function salvarAnalise() {
   d.analise  = document.getElementById('al-analise').value.trim()   || null;
   d.resolucao= document.getElementById('al-resolucao').value.trim() || null;
   d.status   = document.getElementById('al-status').value;
-  if (d.status === 'Concluída' || d.status === 'Improcedente') d.dataConclusao = new Date().toISOString().split('T')[0];
+  if (d.status === 'Concluída' || d.status === 'Improcedente') d.dataConclusao = hojeBR();
   mostrarLoading(true);
   try {
     await dbSalvarDemanda(d);
@@ -1016,7 +1039,7 @@ async function confirmarAlterarStatus() {
     d.dataConclusao = null;
   } else {
     // Se for para encerrado, define data de conclusão
-    d.dataConclusao = new Date().toISOString().split('T')[0];
+    d.dataConclusao = hojeBR();
   }
 
   // Adiciona o motivo como comentário do planejamento (append)
@@ -1051,7 +1074,7 @@ function exportExcel() {
   if (!filteredDemandas.length) { toast('Nenhuma demanda para exportar.','error'); return; }
   const rows = [
     ['ID','Data','Site','Local','TAG','Situação','Status','Prioridade','Equipe','Solicitante','Tempo Vida (dias)','Descrição','Nº OM','Análise','Resolução','Técnico','Data Conclusão','Comentário Planejamento'],
-    ...filteredDemandas.map(d => [d.id,formatDate(d.data),d.site,d.local,d.tag,d.situacao,d.status||'Aberta',d.prioridade||'',d.equipe||'',d.solicitante,calcularTempoVida(d).replace(' dias','').replace('< ','').replace(' dia',''),d.descricao,d.om||'',d.analise||'',d.resolucao||'',d.tecnico||'',formatDate(d.dataConclusao)||'',d.comentarioPlan||''])
+    ...filteredDemandas.map(d => [d.id,d.data,d.site,d.local,d.tag,d.situacao,d.status||'Aberta',d.prioridade||'',d.equipe||'',d.solicitante,calcularTempoVida(d).replace(' dias','').replace('< ','').replace(' dia',''),d.descricao,d.om||'',d.analise||'',d.resolucao||'',d.tecnico||'',d.dataConclusao||'',d.comentarioPlan||''])
   ];
   const wb = XLSX.utils.book_new();
   const ws = XLSX.utils.aoa_to_sheet(rows);
@@ -1159,7 +1182,7 @@ function toast(msg, type = 'info') {
   setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 300); }, 3500);
 }
 
-function formatDate(d)    { if(!d) return '—'; const[y,m,dd]=d.split('-'); return `${dd}/${m}/${y}`; }
+function formatDate(d)    { if(!d) return '—'; if(d.includes('/')) return d; const[y,m,dd]=d.split('-'); return `${dd}/${m}/${y}`; }
 function formatDateTime(dt){ if(!dt) return '—'; const d=new Date(dt); return d.toLocaleDateString('pt-BR')+' '+d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}); }
 function calcularTempoVida(d) {
   if (!d.data) return '—';
@@ -1207,10 +1230,12 @@ async function loadRelatorio() {
     }
 
     // Define data padrão como hoje
-    const hoje = new Date().toISOString().split('T')[0];
+    const hoje = hojeBR();
     const dataInput = document.getElementById('rel-data');
     if (dataInput && !dataInput.value) {
-      dataInput.value = hoje;
+      // input type=date precisa de YYYY-MM-DD
+      const hojeISO = new Date().toISOString().split('T')[0];
+      dataInput.value = hojeISO;
     }
 
     aplicarFiltrosRelatorio();
@@ -1223,13 +1248,13 @@ async function loadRelatorio() {
 }
 
 function aplicarFiltrosRelatorio() {
-  const data = document.getElementById('rel-data').value;
+  const data = document.getElementById('rel-data').value; // YYYY-MM-DD do input
 
   // Filtra apenas demandas concluídas ou improcedentes com data de conclusão
   relatorioFiltrado = allDemandas.filter(d => {
     const st = d.status || 'Aberta';
     if (st !== 'Concluída' && st !== 'Improcedente') return false;
-    if (data && d.dataConclusao !== data) return false;
+    if (data && toISODate(d.dataConclusao) !== data) return false;
     if (!data && !d.dataConclusao) return false;
     return true;
   });
@@ -1237,7 +1262,7 @@ function aplicarFiltrosRelatorio() {
   // Ordena por data de conclusão decrescente, depois por prioridade
   const pd = { P0: 0, P1: 1, P2: 2, P3: 3, P4: 4, P5: 5 };
   relatorioFiltrado.sort((a, b) => {
-    const dataDiff = new Date(b.dataConclusao || b.data) - new Date(a.dataConclusao || a.data);
+    const dataDiff = new Date(toISODate(b.dataConclusao || b.data)) - new Date(toISODate(a.dataConclusao || a.data));
     if (dataDiff !== 0) return dataDiff;
     return (pd[a.prioridade] ?? 99) - (pd[b.prioridade] ?? 99);
   });
