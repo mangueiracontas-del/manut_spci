@@ -1051,7 +1051,7 @@ function exportExcel() {
   if (!filteredDemandas.length) { toast('Nenhuma demanda para exportar.','error'); return; }
   const rows = [
     ['ID','Data','Site','Local','TAG','Situação','Status','Prioridade','Equipe','Solicitante','Tempo Vida (dias)','Descrição','Nº OM','Análise','Resolução','Técnico','Data Conclusão','Comentário Planejamento'],
-    ...filteredDemandas.map(d => [d.id,d.data,d.site,d.local,d.tag,d.situacao,d.status||'Aberta',d.prioridade||'',d.equipe||'',d.solicitante,calcularTempoVida(d).replace(' dias','').replace('< ','').replace(' dia',''),d.descricao,d.om||'',d.analise||'',d.resolucao||'',d.tecnico||'',d.dataConclusao||'',d.comentarioPlan||''])
+    ...filteredDemandas.map(d => [d.id,formatDate(d.data),d.site,d.local,d.tag,d.situacao,d.status||'Aberta',d.prioridade||'',d.equipe||'',d.solicitante,calcularTempoVida(d).replace(' dias','').replace('< ','').replace(' dia',''),d.descricao,d.om||'',d.analise||'',d.resolucao||'',d.tecnico||'',formatDate(d.dataConclusao)||'',d.comentarioPlan||''])
   ];
   const wb = XLSX.utils.book_new();
   const ws = XLSX.utils.aoa_to_sheet(rows);
